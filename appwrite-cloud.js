@@ -21,9 +21,19 @@
     const missing=TABLE_NAMES.filter(n=>!tableMap[n]);
     if(missing.length)throw new Error('Missing Appwrite tables: '+missing.join(', '));
   }
-  async function activeSession(){try{return await account.getSession({sessionId:'current'})}catch(e){return null}}
+  async function activeSession(){
+    try{return await account.getSession({sessionId:'current'})}catch(e){}
+    try{const u=await account.get();if(u)return {userId:u.$id,status:'authenticated'};}catch(e){}
+    return null;
+  }
   async function currentUser(){try{return await account.get()}catch(e){return null}}
-  async function authState(){const session=await activeSession();if(!session)return null;const user=await currentUser();return {session,user};}
+  async function authState(){
+    const user=await currentUser();
+    if(!user)return null;
+    let session=null;
+    try{session=await account.getSession({sessionId:'current'})}catch(e){session={userId:user.$id,status:'authenticated'};}
+    return {session,user};
+  }
   function errText(e){return e?.message||e?.response?.message||String(e||'Unknown error')}
   async function init(){
     if(!initSdk()){status('SDK unavailable');gate(true);return false}
@@ -99,7 +109,12 @@
   window.cloudLoginPrompt=async function(){
     if(!initSdk())return toast('Cloud SDK unavailable');
     const email=prompt('Appwrite Email');if(!email)return;const password=prompt('Appwrite Password');if(!password)return;
-    try{await account.createEmailPasswordSession({email,password});cloudReady=false;const ok=await init();toast(ok?'Cloud login successful':'Cloud login successful, but sync setup needs attention')}catch(e){console.error(e);toast(errText(e)||'Login failed')}
+    try{
+      await account.createEmailPasswordSession({email,password});
+      cloudReady=false;
+      const ok=await init();
+      toast(ok?'Cloud login successful':'Cloud login successful, but sync setup needs attention');
+    }catch(e){console.error(e);toast(errText(e)||'Login failed')}
   };
   window.cloudRegisterPrompt=async function(){
     if(!initSdk())return toast('Cloud SDK unavailable');
