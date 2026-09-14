@@ -1,0 +1,1649 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/appwrite@23.0.0"></script>
+<script src="appwrite-cloud.js"></script>
+<script src="ai-copilot.js"></script>
+<script src="premium-v29.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="SZ Billing - offline CCTV billing, quotation and invoice app">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>SZ Billing</title>
+<style>
+:root{--bg:#f3f6fa;--card:#fff;--ink:#101828;--muted:#667085;--line:#e4e7ec;--brand:#0b1220;--accent:#13a8ff;--danger:#d92d20;--ok:#039855;--shadow:0 8px 30px rgba(16,24,40,.08)}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+.splash{position:fixed;inset:0;background:#05070b;display:flex;align-items:center;justify-content:center;z-index:9999;transition:.35s}
+.splash img{width:min(82vw,430px);max-height:70vh;object-fit:contain}.splash.hide{opacity:0;pointer-events:none}
+.app{min-height:100vh;padding-bottom:86px}.top{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.97);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.top img{width:44px;height:44px;object-fit:contain;border-radius:10px}.top .brand{font-weight:800;font-size:20px;line-height:1}.top small{display:block;color:#b7c1d1;font-size:11px;margin-top:4px}
+main{max-width:1050px;margin:auto;padding:18px 14px}.page{display:none}.page.active{display:block}.title{font-size:28px;font-weight:850;margin:4px 0 16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+.stat{min-height:105px}.stat b{font-size:26px;display:block;margin-top:8px}.muted{color:var(--muted)}.small{font-size:12px}
+label{display:block;font-size:12px;font-weight:700;color:#475467;margin:0 0 6px}input,select,textarea{width:100%;border:1px solid #d0d5dd;border-radius:12px;padding:11px 12px;background:#fff;color:var(--ink);outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(19,168,255,.12)}textarea{min-height:85px;resize:vertical}.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.row3{display:grid;grid-template-columns:1.3fr .8fr .8fr;gap:10px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.btn{border:0;border-radius:12px;padding:11px 14px;font-weight:800;background:var(--brand);color:#fff}.btn.secondary{background:#eef2f6;color:#111827}.btn.ok{background:var(--ok)}.btn.danger{background:var(--danger)}.btn.accent{background:var(--accent)}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:640px}.table th,.table td{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}.table th{font-size:11px;text-transform:uppercase;color:var(--muted)}
+.bottom{position:fixed;bottom:0;left:0;right:0;z-index:30;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:7px 4px calc(7px + env(safe-area-inset-bottom));box-shadow:0 -5px 20px rgba(16,24,40,.08)}
+.navbtn{border:0;background:transparent;color:#667085;font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 7px}.navbtn span{font-size:20px}.navbtn.active{color:#0b1220}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border-bottom:0}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800}.badge.ok{background:#ecfdf3;color:#027a48}.badge.pending{background:#fffaeb;color:#b54708}.badge.due{background:#fef3f2;color:#b42318}
+.logo-preview{width:110px;height:110px;object-fit:contain;border:1px dashed #98a2b3;border-radius:16px;padding:6px;background:#f8fafc}
+.doc{background:#fff;max-width:800px;margin:auto;border:1px solid #ddd;padding:28px;box-shadow:var(--shadow)}.doc-head{display:flex;justify-content:space-between;gap:15px;border-bottom:2px solid #111827;padding-bottom:16px}.doc-logo{width:170px;height:85px;object-fit:contain}.doc h1{margin:0;font-size:25px}.doc-meta{text-align:right;font-size:12px}.doc table{width:100%;border-collapse:collapse;margin-top:18px}.doc th,.doc td{border-bottom:1px solid #ddd;padding:8px;text-align:left;font-size:12px}.doc .total{margin-left:auto;max-width:300px;margin-top:14px}.doc .total div{display:flex;justify-content:space-between;padding:5px}.doc .grand{font-size:17px;font-weight:900;border-top:2px solid #111827;margin-top:4px;padding-top:8px}.terms{white-space:pre-wrap;font-size:11px;color:#555;margin-top:20px}
+.empty{text-align:center;color:var(--muted);padding:25px}.search{margin-bottom:12px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:50;display:none;align-items:flex-end}.modal.show{display:flex}.sheet{background:#fff;width:100%;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:18px}.x{float:right;border:0;background:#eee;border-radius:50%;width:34px;height:34px}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#111827;color:#fff;padding:11px 16px;border-radius:999px;font-size:13px;z-index:80;display:none}
+@media(min-width:760px){.bottom{position:sticky;top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line);justify-content:center;gap:10px}.app{padding-bottom:0}.navbtn{font-size:12px;padding:10px 15px}.navbtn span{font-size:18px}}
+@media(max-width:560px){.grid3{grid-template-columns:1fr}.row,.row3{grid-template-columns:1fr}.title{font-size:25px}.doc{padding:16px}.doc-head{flex-direction:column}.doc-meta{text-align:left}.doc-logo{width:150px}}
+@media print{body{background:#fff}.top,.bottom,.no-print{display:none!important}.app{padding:0}.page{display:none!important}.page.printing{display:block!important}.doc{box-shadow:none;border:0;max-width:none;padding:8mm}.print-only{display:block!important}@page{size:A4;margin:10mm}}
+.print-only{display:none}
+
+/* v4 usability/theme improvements */
+.theme-slate{--brand:#0b1220;--accent:#13a8ff}
+.theme-blue{--brand:#123b73;--accent:#2563eb}
+.theme-green{--brand:#14532d;--accent:#16a34a}
+.theme-purple{--brand:#3b176d;--accent:#7c3aed}
+.theme-gold{--brand:#4a3510;--accent:#c58b18}
+.editor-summary{position:sticky;bottom:78px;z-index:10;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);padding:10px;border:1px solid var(--line);border-radius:16px;margin-top:12px}
+.preview-doc-wrap{background:#eef2f6;padding:14px;border-radius:18px}
+.preview-doc-wrap .doc{box-shadow:none}
+.theme-card{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.theme-btn{border:2px solid #d0d5dd;border-radius:14px;padding:12px 6px;background:#fff;font-weight:800}
+@media(max-width:560px){.theme-card{grid-template-columns:repeat(2,1fr)}}
+
+.pick-list{display:flex;flex-direction:column;gap:8px;max-height:55vh;overflow:auto;margin:12px 0}.pick-item{width:100%;display:flex;align-items:center;justify-content:space-between;text-align:left;padding:13px;border:1px solid var(--border);border-radius:12px;background:var(--card);color:var(--text);cursor:pointer}.pick-item span{display:flex;flex-direction:column;gap:3px}.pick-item small{opacity:.7}.pick-item strong{font-size:12px}.item-editor-note{font-size:13px;opacity:.72;margin:-4px 0 10px}.muted{opacity:.7;font-size:13px}.empty{padding:14px;border:1px dashed var(--border);border-radius:12px;opacity:.75}
+
+.bill-items{margin-top:14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+.bill-items-head{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:var(--soft);border-bottom:1px solid var(--line)}
+.bill-items-head span{font-size:12px;color:var(--muted)}
+.bill-item-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:11px 13px;border-bottom:1px solid var(--line)}
+.bill-item-row:last-child{border-bottom:0}
+.bill-item-row small{display:block;color:var(--muted);margin-top:3px}
+@media(max-width:600px){.bill-item-row{grid-template-columns:1fr auto;}.bill-item-row .actions{grid-column:1/-1}}
+
+/* V30 UX: compact bottom navigation + slide-out feature drawer */
+.menu-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:9998;display:none;backdrop-filter:blur(2px)}
+.menu-backdrop.show{display:block}
+.side-drawer{position:fixed;top:0;right:0;height:100%;width:min(88vw,390px);background:var(--card);z-index:9999;transform:translateX(105%);transition:transform .25s ease;box-shadow:-12px 0 35px rgba(16,24,40,.18);overflow:auto;padding:18px}
+.side-drawer.show{transform:translateX(0)}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.drawer-title{font-size:20px;font-weight:800}
+.drawer-group{margin:14px 0}
+.drawer-label{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--muted);margin:12px 4px 7px}
+.drawer-item{width:100%;display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:12px 13px;margin:7px 0;text-align:left;color:var(--ink)}
+.drawer-item:active{transform:scale(.99)}
+.drawer-icon{width:30px;text-align:center;font-size:20px}
+.bottom{z-index:1000}
+.bottom .navbtn.menu-btn{background:var(--brand);color:#fff;border-color:var(--brand)}
+/* Billing should be an editor, not a second invoice list. Saved invoices live in Invoice History. */
+#billingList{display:none!important}
+/* Make auto-save status visible but unobtrusive */
+.autosave-note{font-size:11px;color:var(--muted);margin-left:auto}
+.ai-reco{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ai-reco .item-copy{flex:1}
+.ai-reco .btn{white-space:nowrap}
+
+/* V50: restore AI Chat Copilot presentation only. No app logic/features changed. */
+.sz-ai-chat{margin-top:14px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.sz-ai-chat-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;background:#f8fbff;border-bottom:1px solid var(--line)}
+.sz-ai-chat-head b{display:block;font-size:17px;font-weight:900}
+.sz-ai-chat-head small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.sz-ai-chat-head>span{font-size:11px;font-weight:800;color:#039855;white-space:nowrap}
+.sz-ai-chat-log{padding:12px 14px;max-height:360px;overflow-y:auto;background:#f7f9fc}
+.sz-ai-msg{display:flex;flex-direction:column;gap:5px;max-width:88%;margin:7px 0;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:#fff;line-height:1.45;font-size:13px;white-space:normal;overflow-wrap:anywhere}
+.sz-ai-msg b{font-size:11px;letter-spacing:.02em;color:#475467}
+.sz-ai-msg.bot{margin-right:auto}
+.sz-ai-msg.user{margin-left:auto;background:#eef7ff;border-color:#cfe8ff}
+.sz-ai-msg span{display:block}
+.sz-ai-chat-suggestions{display:flex;flex-wrap:wrap;gap:7px;padding:10px 14px;border-top:1px solid var(--line);background:#fff}
+.sz-ai-chat-suggestions button{border:1px solid #cfd8e3;background:#f8fafc;color:#182230;border-radius:999px;padding:8px 11px;font-size:12px;font-weight:750}
+.sz-ai-chat-input{display:flex;gap:8px;padding:12px 14px calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#fff}
+.sz-ai-chat-input input{flex:1;min-width:0}
+.sz-ai-chat-input button{border:0;border-radius:12px;padding:11px 16px;background:var(--accent);color:#fff;font-weight:850;white-space:nowrap}
+.sz-ai-chat-action{align-self:flex-start;border:0;border-radius:9px;padding:7px 11px;background:var(--accent);color:#fff;font-weight:800;font-size:12px}
+@media(max-width:560px){.sz-ai-chat-head{align-items:flex-start}.sz-ai-chat-head>span{font-size:10px}.sz-ai-chat-log{max-height:300px}.sz-ai-msg{max-width:94%}.sz-ai-chat-input{gap:6px}.sz-ai-chat-input button{padding:11px 13px}}
+</style>
+
+<style id="sz-pro-billing-css">
+.sz-pro-sheet{background:#fff;max-width:900px;margin:14px auto;padding:28px;border-radius:14px;box-shadow:0 10px 35px rgba(0,0,0,.12)}
+.sz-pro-table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+.sz-pro-table th,.sz-pro-table td{border:1px solid #cbd5e1;padding:9px 8px}
+.sz-pro-table th{background:#f1f5f9;text-align:left}
+.sz-pro-table th:nth-child(2),.sz-pro-table td:nth-child(2),
+.sz-pro-table th:nth-child(3),.sz-pro-table td:nth-child(3),
+.sz-pro-table th:nth-child(4),.sz-pro-table td:nth-child(4){text-align:center}
+.sz-pro-total{display:flex;justify-content:flex-end;margin-top:16px}
+.sz-pro-total table{min-width:280px;border-collapse:collapse}
+.sz-pro-total td{padding:6px 10px;border-bottom:1px solid #e2e8f0}
+.sz-pro-total td:last-child{text-align:right;font-weight:700}
+.sz-pro-theme{display:flex;gap:8px;flex-wrap:wrap}
+.sz-pro-theme button{padding:8px 12px;border-radius:9px;border:1px solid #cbd5e1;background:#fff}
+@media print{.sz-pro-sheet{box-shadow:none;margin:0;max-width:none;border-radius:0}.no-print{display:none!important}}
+</style>
+
+<style id="sz-final-css">
+.sz-live-items{margin:14px 0;border:1px solid #d7dee8;border-radius:12px;overflow:hidden;background:#fff}
+.sz-live-items .title{padding:10px 12px;font-weight:800;background:#f5f7fa;border-bottom:1px solid #d7dee8}
+.sz-live-items .row{display:grid;grid-template-columns:1fr 70px 70px 90px;gap:0;border-bottom:1px solid #e2e8f0}
+.sz-live-items .row:last-child{border-bottom:0}
+.sz-live-items .row>div{padding:8px;border-right:1px solid #e2e8f0}
+.sz-live-items .row>div:last-child{border-right:0}
+.sz-payment-card{margin-top:16px;border:1px solid #d7dee8;border-radius:12px;padding:12px;background:#f8fafc}
+.sz-payment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sz-payment-grid .p{padding:10px;background:#fff;border:1px solid #e2e8f0;border-radius:9px}
+.sz-payment-grid b{display:block;font-size:12px;color:#64748b}
+.sz-payment-grid span{font-size:18px;font-weight:800}
+@media(max-width:600px){.sz-live-items .row{grid-template-columns:1fr 55px 55px 78px}.sz-payment-grid{grid-template-columns:1fr}}
+</style>
+<style id="premium-v29-css">
+:root{--premium:#0b1f3a;--premium2:#153d68;--premiumSoft:#eef4fb;--premiumLine:#dce6f2}.page-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}.page-head h1{margin:3px 0;font-size:27px;letter-spacing:-.5px}.eyebrow{font-size:11px;letter-spacing:1.7px;font-weight:900;color:#55708d}.history-toolbar{display:grid;grid-template-columns:1fr 150px;gap:10px;margin-bottom:12px}.history-toolbar input,.history-toolbar select{padding:12px;border:1px solid var(--premiumLine);border-radius:12px;background:#fff}.history-row{display:grid;grid-template-columns:1.3fr .8fr auto;gap:12px;align-items:center;padding:15px;background:#fff;border:1px solid var(--premiumLine);border-radius:16px;margin:9px 0;box-shadow:0 4px 14px rgba(11,31,58,.05)}.history-no{font-weight:900;color:var(--premium)}.history-money{text-align:right;font-weight:900}.pending-text{color:#b45309}.paid-text{color:#16805b}.ai-orb{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#0b1f3a,#2d6aa5);color:#fff;font-size:26px;box-shadow:0 12px 28px rgba(11,31,58,.2)}.ai-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.ai-grid>div{background:linear-gradient(180deg,#fff,#f7faff);border:1px solid var(--premiumLine);border-radius:17px;padding:16px}.ai-score{font-size:21px;font-weight:900;color:var(--premium);margin:7px 0}.success-card{padding:15px;border-radius:15px;background:#ecfdf5;border:1px solid #b7ead2;color:#146b4a;margin-top:12px}.ai-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.section-title{font-weight:900;font-size:16px;margin-bottom:5px}@media(max-width:700px){.page-head{align-items:flex-start}.history-row{grid-template-columns:1fr auto}.history-row .actions{grid-column:1/-1}.history-money{text-align:right}.ai-grid{grid-template-columns:1fr}.history-toolbar{grid-template-columns:1fr}}
+</style>
+<style id="v31-modern-ui">
+:root{--ui-bg:#f5f7fb;--ui-surface:#fff;--ui-ink:#101828;--ui-muted:#667085;--ui-line:#e5eaf1;--ui-primary:#165dff;--ui-primary2:#0f4bd8;--ui-soft:#edf4ff}
+body{background:var(--ui-bg);color:var(--ui-ink)}
+.app{max-width:1120px;margin:auto;padding-bottom:24px}
+.top{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.94);color:var(--ui-ink);border-bottom:1px solid var(--ui-line);padding:10px 14px;box-shadow:0 3px 18px rgba(16,24,40,.06);backdrop-filter:blur(14px)}
+.top .brand{font-size:18px;font-weight:900}.top .top-sub{font-size:11px;color:var(--ui-muted)}
+.top-menu{width:42px;height:42px;border:1px solid var(--ui-line);background:#fff;border-radius:13px;font-size:21px;display:grid;place-items:center;cursor:pointer}
+.top-logo{width:38px;height:38px;border-radius:11px;object-fit:contain;border:1px solid var(--ui-line);background:#fff}
+.page{padding:18px 14px}.title{font-size:28px;font-weight:950;letter-spacing:-.7px;margin-bottom:14px}
+.card{border:1px solid var(--ui-line);box-shadow:0 7px 24px rgba(16,24,40,.05);border-radius:18px;background:var(--ui-surface)}
+.stat{padding:17px}.stat b{font-size:25px;display:block;margin-top:7px}.stat .muted{font-size:12px}
+.actions .btn,.btn{border-radius:12px}.btn{background:var(--ui-primary)}.btn:hover{background:var(--ui-primary2)}
+.dashboard-hero{background:linear-gradient(135deg,#0f2f63,#165dff);color:#fff;border:0;padding:20px;border-radius:22px;box-shadow:0 16px 35px rgba(22,93,255,.18)}
+.dashboard-hero .muted{color:rgba(255,255,255,.78)}
+.action-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.action-tile{border:1px solid var(--ui-line);background:#fff;border-radius:16px;padding:14px;text-align:left;cursor:pointer}.action-tile b{display:block;margin-top:7px}.action-tile small{color:var(--ui-muted)}.action-icon{width:36px;height:36px;border-radius:11px;background:var(--ui-soft);display:grid;place-items:center;font-size:18px}
+.side-drawer{z-index:10000;width:min(88vw,360px);box-shadow:20px 0 50px rgba(0,0,0,.16);background:#fff}.drawer-item{border-radius:14px}.drawer-item:hover{background:#f4f7fb}
+/* Reference-inspired mobile UX: no bottom navigation. All secondary features live in the top-left drawer. */
+.bottom{display:none!important}.app{padding-bottom:0}
+@media(min-width:760px){.page{padding:24px}.top{border-radius:0}.action-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:600px){.grid3{grid-template-columns:1fr 1fr}.grid3 .stat:last-child{grid-column:1/-1}.title{font-size:24px}}
+</style>
+
+<style id="v32-pro-ui">
+:root{--ui-primary:#165dff;--ui-primary2:#0b4dd8;--ui-soft:#edf4ff;--ui-line:#e4eaf2;--ui-ink:#101828;--ui-muted:#667085}
+body{background:radial-gradient(circle at 15% 0%,#eef5ff 0,#f6f8fc 35%,#f5f7fb 100%)}
+.top{height:66px;padding:10px 16px;border-bottom:1px solid rgba(228,234,242,.9);background:rgba(255,255,255,.88);box-shadow:0 5px 24px rgba(16,24,40,.06)}
+.top-menu{width:44px;height:44px;border-radius:14px;background:#fff;box-shadow:0 3px 12px rgba(16,24,40,.05);transition:.18s}.top-menu:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(16,24,40,.09)}
+.page{padding-top:22px}.title{font-size:30px;letter-spacing:-1px}.dashboard-hero{position:relative;overflow:hidden;padding:24px;border-radius:26px;background:linear-gradient(135deg,#0b2552 0%,#145dff 62%,#3b82f6 100%);box-shadow:0 20px 50px rgba(22,93,255,.19)}.dashboard-hero:after{content:"";position:absolute;width:230px;height:230px;border-radius:50%;right:-70px;top:-110px;background:rgba(255,255,255,.10)}
+.action-grid{gap:12px}.action-tile{position:relative;min-height:112px;border-radius:18px;border:1px solid #e5eaf2;box-shadow:0 5px 18px rgba(16,24,40,.045);transition:.18s}.action-tile:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(16,24,40,.08)}.action-icon{width:42px;height:42px;border-radius:13px}
+.grid3 .stat{border-radius:20px;min-height:118px}.grid3 .stat b{font-size:29px}
+.side-drawer{left:0;right:auto;transform:translateX(-105%);width:min(90vw,390px);padding:0;background:linear-gradient(180deg,#fff 0%,#f8fbff 100%);box-shadow:18px 0 55px rgba(16,24,40,.18);border-right:1px solid #e4eaf2}.side-drawer.show{transform:translateX(0)}.drawer-head{padding:20px 18px 14px;margin:0;background:linear-gradient(135deg,#0b2552,#165dff);color:#fff}.drawer-head .drawer-label{color:rgba(255,255,255,.65)}.drawer-title{font-size:23px}.drawer-head .btn.secondary{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.18)}.drawer-group{padding:7px 13px}.drawer-label{padding:0 4px}.drawer-item{border:1px solid transparent;background:transparent;border-radius:16px;padding:13px 12px;margin:5px 0;transition:.15s}.drawer-item:hover{background:#eef5ff;border-color:#d9e7ff}.drawer-item b{font-size:14px}.drawer-icon{width:38px;height:38px;border-radius:12px;background:#edf4ff;display:grid;place-items:center;font-size:18px}.menu-backdrop{background:rgba(7,15,31,.38);backdrop-filter:blur(3px)}
+#billing{max-width:1050px;margin:auto}.billing-editor-shell{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(290px,.7fr);gap:14px;align-items:start}.billing-main-card,.billing-side-card{background:#fff;border:1px solid #e4eaf2;border-radius:22px;box-shadow:0 9px 28px rgba(16,24,40,.055)}.billing-main-card{padding:16px}.billing-side-card{padding:15px;position:sticky;top:82px}.billing-section-title{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900;font-size:15px;margin:2px 0 10px}.billing-main-card .row{gap:12px}.billing-main-card input,.billing-main-card select{min-height:46px;border-radius:14px;background:#fbfcfe}.bill-items{border:1px solid #e2e8f0;border-radius:18px;box-shadow:0 4px 15px rgba(16,24,40,.035)}.bill-items-head{padding:13px 15px;background:#f7faff}.bill-item-row{padding:13px 15px}.billing-editor-shell .editor-summary{position:static;margin:0;background:#f6f9ff;border:1px solid #dce8ff;box-shadow:none}.billing-editor-shell .actions{gap:7px}.billing-editor-shell .actions .btn{min-height:42px;border-radius:13px}.custom-item-btn{width:100%;border:1px dashed #9dbbf3;background:#f5f9ff;color:#165dff;border-radius:14px;padding:12px;font-weight:900;margin-top:10px}.billing-preview-mini{background:#f7f9fc;border:1px solid #e4eaf2;border-radius:18px;padding:10px;margin-top:10px}.billing-preview-mini .doc{padding:14px;box-shadow:none;border:1px solid #e4eaf2;transform-origin:top center}
+.settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.design-option{border:1px solid #e0e7f0;border-radius:18px;background:#fff;padding:14px;cursor:pointer;text-align:left;transition:.16s}.design-option:hover{border-color:#9dbbf3;box-shadow:0 8px 20px rgba(16,24,40,.06)}.design-option.active{border:2px solid #165dff;background:#f5f9ff}.design-thumb{height:74px;border-radius:12px;margin-bottom:10px;background:linear-gradient(135deg,#0b2552,#165dff);position:relative;overflow:hidden}.design-thumb.alt{background:linear-gradient(135deg,#14532d,#16a34a)}.design-thumb.light{background:linear-gradient(135deg,#f8fafc,#e8eef8)}.design-thumb.dark{background:linear-gradient(135deg,#111827,#374151)}.design-thumb:after{content:"";position:absolute;left:12px;right:12px;bottom:12px;height:8px;border-radius:4px;background:rgba(255,255,255,.75);box-shadow:0 -17px 0 rgba(255,255,255,.35),0 -34px 0 rgba(255,255,255,.22)}.design-option strong{display:block}.design-option small{color:var(--ui-muted)}
+.ai-command{display:grid;grid-template-columns:1fr auto;gap:9px}.ai-command input{min-height:50px;border-radius:16px}.ai-command .btn{min-width:120px}.ai-reco{align-items:center}.ai-reco .btn{white-space:nowrap}.ai-orb{background:linear-gradient(145deg,#0b2552,#165dff);border-radius:18px}
+@media(max-width:760px){.billing-editor-shell{grid-template-columns:1fr}.billing-side-card{position:static}.settings-grid{grid-template-columns:1fr}.ai-command{grid-template-columns:1fr}.ai-command .btn{width:100%}}
+</style>
+<style id="sz-v36-final-style">
+html,body{width:100%;min-width:0;overflow-x:hidden}body{font-size:15px}.app{width:100%;max-width:none!important;margin:0!important}.top{width:100%;position:sticky;top:0}.app main,main{width:100%;max-width:1050px;margin:0 auto;padding-left:14px;padding-right:14px}.page{width:100%;max-width:none;min-width:0}.page.active{width:100%}#billing{width:100%!important;max-width:760px!important;margin:0 auto!important}.billing-v35,.billing-v35-card,.billing-v35-body{width:100%!important;max-width:none!important;min-width:0}.billing-v35-card{overflow:hidden}.v35-grid,.v35-grid.three,.v35-totals,.v35-actions{min-width:0}.v35-section input,.v35-section select,.v35-section textarea{max-width:100%;box-sizing:border-box}.v35-actions{position:sticky;bottom:0}.v35-sticky{position:sticky;bottom:0}
+@media(max-width:760px){main{padding:10px 10px 20px!important}.page{padding:10px 0!important}.title{font-size:24px!important}.billing-v35-card{border-radius:16px!important;margin-bottom:7px}.billing-v35-head{padding:13px!important}.billing-v35-body{padding:7px!important}.v35-section{padding:8px!important;margin-bottom:7px!important}.v35-grid,.v35-grid.three{grid-template-columns:1fr 1fr!important}.v35-grid .full{grid-column:1/-1}.v35-totals{grid-template-columns:1fr 1fr!important}.v35-total.grand{grid-column:1/-1}.v35-actions{grid-template-columns:1fr 1fr!important}.v35-actions .btn{min-height:42px!important}.v35-add{min-height:44px!important}}
+@media(min-width:761px){#billing{max-width:760px!important}}
+/* Never render patch/source text as page content. */
+</style>
+<style id="sz-v48-v36-display">
+/* V48: restore V36 display model. No transform/zoom fit scripts. */
+html,body{width:100%;min-width:0;overflow-x:hidden!important;margin:0!important;}
+body{font-size:15px;min-height:100vh;overflow-y:auto!important;-webkit-overflow-scrolling:touch;}
+.app{width:100%;max-width:none!important;margin:0 auto!important;min-height:100vh;padding-bottom:0!important;}
+.top{width:100%;position:sticky;top:0;z-index:20;}
+.app>main,main{width:100%;max-width:1050px;margin:0 auto;padding-left:14px;padding-right:14px;}
+.page{width:100%;max-width:none;min-width:0;transform:none!important;zoom:1!important;}
+.page.active{width:100%;}
+@media(max-width:760px){
+  .app{min-height:100vh!important;height:auto!important;}
+  .app>main,main{width:100%!important;max-width:100%!important;padding:10px 10px 20px!important;}
+  .page{padding:10px 0!important;}
+  .title{font-size:24px!important;}
+  .grid3 .stat{min-height:90px!important;}
+  .dashboard-hero{padding:16px!important;border-radius:20px!important;}
+  .action-grid{gap:8px!important;}
+  .action-tile{min-height:82px!important;padding:11px!important;border-radius:15px!important;}
+  .action-icon{width:36px!important;height:36px!important;border-radius:11px!important;}
+  .v35-section{padding:8px!important;margin-bottom:7px!important;}
+  .billing-v35-head{padding:12px!important;}
+  .billing-v35-body{padding:7px!important;}
+}
+@media(min-width:761px){.app{min-height:100vh!important;}.app>main{padding-top:18px!important;padding-bottom:24px!important;}}
+</style>
+</head>
+<body>
+<div class="splash" id="splash"><img src="logo-master.png" alt="SZ Billing"></div>
+<div id="cloudGate" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(5,7,11,.96);align-items:center;justify-content:center;padding:22px;text-align:center">
+  <div style="width:min(430px,100%);background:#111722;border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:28px;box-shadow:0 20px 70px rgba(0,0,0,.45)">
+    <img src="icon-192.png" style="width:82px;height:82px;border-radius:20px;object-fit:contain" alt="SZ Billing">
+    <h2 style="margin:16px 0 6px;color:#fff">Cloud Login Required</h2>
+    <p style="margin:0 0 20px;color:#aeb7c7;font-size:14px">Login to use SZ Billing and sync your cloud data.</p>
+    <button class="btn" style="width:100%" onclick="cloudLoginPrompt()">☁ Cloud Login</button>
+    <button class="btn secondary" style="width:100%;margin-top:9px" onclick="cloudRegisterPrompt()">Create Account</button>
+    <div id="cloudGateStatus" style="margin-top:14px;color:#aeb7c7;font-size:12px"></div>
+  </div>
+</div>
+<div class="app">
+<header class="top">
+<button class="top-menu" type="button" aria-label="Open menu" onclick="openFeatureMenu()">☰</button>
+<img id="topLogo" class="top-logo" src="icon-192.png" alt="SZ">
+<div style="min-width:0"><div class="brand">SZ Billing</div><div class="top-sub">Smart invoicing & business management</div></div>
+<div style="margin-left:auto"><button class="top-menu" type="button" aria-label="Home" onclick="openPage('home')">⌂</button></div>
+</header>
+
+<main>
+<section id="home" class="page active">
+<div class="title">Dashboard</div>
+<div class="grid3">
+<div class="card stat"><span class="muted">Customers</span><b id="sCustomers">0</b></div>
+<div class="card stat"><span class="muted">Invoices</span><b id="sInvoices">0</b></div>
+<div class="card stat"><span class="muted">Pending</span><b id="sPending">Rs. 0</b></div>
+</div>
+<div class="dashboard-hero">
+<div style="font-size:12px;font-weight:800;opacity:.8">QUICK ACTIONS</div>
+<div style="font-size:22px;font-weight:950;margin-top:5px">Create, manage and get paid faster</div>
+<div class="muted" style="margin-top:5px">Everything else is available from the ☰ menu.</div>
+<div class="action-grid">
+<button class="action-tile" onclick="newBilling('invoice')"><span class="action-icon">🧾</span><b>New Invoice</b><small>Create a professional bill</small></button>
+<button class="action-tile" onclick="openPage('customers');openCustomer()"><span class="action-icon">👤</span><b>New Customer</b><small>Add client details</small></button>
+<button class="action-tile" onclick="openPage('products');openProduct()"><span class="action-icon">📦</span><b>New Product</b><small>Add item or service</small></button>
+<button class="action-tile" onclick="openPage('history')"><span class="action-icon">🕘</span><b>Invoice History</b><small>Find and edit saved bills</small></button>
+</div></div>
+<div class="card"><b>Recent Activity</b><div id="recent"></div></div>
+</section>
+
+<section id="customers" class="page">
+<div class="title">Customers</div>
+<div class="actions"><button class="btn" onclick="openCustomer()">+ Add Customer</button></div>
+<div class="card"><input class="search" id="customerSearch" placeholder="Search customer..." oninput="renderCustomers()"><div id="customerList"></div></div>
+</section>
+
+<section id="products" class="page">
+<div class="title">Products / Items</div>
+<div class="actions"><button class="btn" onclick="openProduct()">+ Add Product</button></div>
+<div class="card"><input class="search" id="productSearch" placeholder="Search product..." oninput="renderProducts()"><div id="productList"></div></div>
+</section>
+
+<section id="billing" class="page">
+<div class="page-head"><div><div class="eyebrow">SMART BILLING</div><div class="title" style="margin-bottom:2px">Create Invoice</div><div class="muted small">Fast, clean and professional billing workspace</div></div><button class="btn accent" onclick="newBilling('invoice')">+ New Invoice</button></div>
+<div id="billingEditor"></div>
+<div class="card" style="display:none"><div id="billingList"></div></div>
+</section>
+
+<section id="whatsapp" class="page">
+<div class="title">WhatsApp Center</div>
+<div class="card">
+<label>Customer</label><select id="waCustomer" onchange="waLoad()"></select>
+<div id="waInfo" style="margin-top:10px"></div>
+<div class="actions"><button class="btn ok" onclick="openWA()">Open WhatsApp Chat</button><button class="btn accent" onclick="pendingPost()">Pending Payment Post</button></div>
+</div>
+<div class="card"><div class="actions" style="justify-content:space-between"><b>WhatsApp History</b><button class="btn secondary" onclick="showAllWAHistory()">View All History</button></div><div id="waHistory"></div></div>
+</section>
+
+<section id="settings" class="page">
+<div class="title">Settings</div>
+<div class="card">
+<div class="row">
+<div><label>Company / Shop Name</label><input id="setName"></div>
+<div><label>Business Phone</label><input id="setPhone"></div>
+</div>
+<div style="margin-top:10px"><label>Address</label><textarea id="setAddress"></textarea></div>
+<div style="margin-top:10px"><label>Quotation / Invoice Terms & Conditions</label><textarea id="setTerms"></textarea></div>
+<div style="margin-top:14px"><label>Theme</label><div class="theme-card"><button class="theme-btn" onclick="setTheme('slate')">Slate</button><button class="theme-btn" onclick="setTheme('blue')">Blue</button><button class="theme-btn" onclick="setTheme('green')">Green</button><button class="theme-btn" onclick="setTheme('purple')">Purple</button><button class="theme-btn" onclick="setTheme('gold')">Gold</button></div></div><div style="margin-top:14px"><label>Company Logo</label><div class="actions"><input type="file" id="logoFile" accept="image/*" onchange="saveLogo(event)"></div><img class="logo-preview" id="logoPreview" src="logo-master.png"></div>
+<div class="actions"><button class="btn" onclick="saveSettings()">Save Settings</button><button class="btn secondary" onclick="resetLogo()">Use SZ Logo</button></div>
+</div>
+<div class="settings-grid">
+<div class="card"><div class="section-title">PDF Billing Themes</div><p class="muted small">Choose the look used when invoices are printed or exported.</p><div class="settings-grid" style="grid-template-columns:1fr 1fr">
+<button class="design-option" data-doc-theme="modern" onclick="setDocTheme('modern')"><div class="design-thumb"></div><strong>Modern Blue</strong><small>Clean business layout</small></button>
+<button class="design-option" data-doc-theme="classic" onclick="setDocTheme('classic')"><div class="design-thumb light"></div><strong>Classic Light</strong><small>Minimal print style</small></button>
+<button class="design-option" data-doc-theme="emerald" onclick="setDocTheme('emerald')"><div class="design-thumb alt"></div><strong>Emerald Pro</strong><small>Fresh professional look</small></button>
+<button class="design-option" data-doc-theme="midnight" onclick="setDocTheme('midnight')"><div class="design-thumb dark"></div><strong>Midnight</strong><small>Premium dark header</small></button>
+</div><div class="actions"><button class="btn accent" onclick="aiDesignDocument()">✨ Let AI choose</button></div></div>
+<div class="card"><div class="section-title">Pending Payment Post Designs</div><p class="muted small">Choose the design used for outstanding-payment WhatsApp posts.</p><div class="settings-grid" style="grid-template-columns:1fr 1fr">
+<button class="design-option" data-post-theme="professional" onclick="setPendingPostTheme('professional')"><div class="design-thumb"></div><strong>Professional</strong><small>Business reminder</small></button>
+<button class="design-option" data-post-theme="minimal" onclick="setPendingPostTheme('minimal')"><div class="design-thumb light"></div><strong>Minimal</strong><small>Simple & clean</small></button>
+<button class="design-option" data-post-theme="emerald" onclick="setPendingPostTheme('emerald')"><div class="design-thumb alt"></div><strong>Emerald</strong><small>Friendly reminder</small></button>
+<button class="design-option" data-post-theme="midnight" onclick="setPendingPostTheme('midnight')"><div class="design-thumb dark"></div><strong>Midnight</strong><small>Premium style</small></button>
+</div><div class="actions"><button class="btn accent" onclick="aiDesignPendingPost()">✨ AI Design</button></div></div>
+</div>
+<div class="card">
+<b>Online Cloud</b>
+<div class="muted small" id="cloudStatus" style="margin-top:6px">Cloud: Not connected</div>
+<div class="actions" style="margin-top:10px"><button class="btn" onclick="cloudLoginPrompt()">Cloud Login</button><button class="btn secondary" onclick="cloudRegisterPrompt()">Create Account</button><button class="btn secondary" onclick="cloudSyncNow()">Sync Now</button><button class="btn danger" onclick="cloudLogout()">Logout</button></div>
+</div>
+<div class="card">
+<b>Backup & Restore</b>
+<div class="actions"><button class="btn" onclick="backup()">Download Backup</button><label class="btn secondary" style="display:inline-block">Restore Backup<input type="file" accept=".json" hidden onchange="restore(event)"></label></div>
+</div>
+<div class="card">
+<b>App</b><p class="muted small">SZ Billing is designed to work offline after the first successful load. Your records are stored on this phone/browser. You can also choose a professional theme and preview documents before printing.</p>
+</div>
+</section>
+
+<section id="ai" class="page">
+<div class="page-head"><div><div class="eyebrow">SMART ASSISTANT</div><div class="title" style="margin-bottom:2px">AI Copilot</div><div class="muted small">Analyze your billing data, find issues and apply safe improvements.</div></div></div>
+<div class="card" style="background:linear-gradient(135deg,#0b2552,#165dff);color:#fff;border:0">
+<div style="font-size:11px;font-weight:900;letter-spacing:.12em;opacity:.75">COPILOT COMMAND</div>
+<div style="font-size:20px;font-weight:950;margin:5px 0">What should I improve?</div>
+<div class="row" style="margin-top:9px"><div><input id="aiCommand" placeholder="e.g. fix invoice data, optimize design, find pending bills" style="background:#fff"></div><div style="max-width:150px"><button class="btn" style="width:100%" onclick="aiRunCommand()">✨ Run</button></div></div>
+<div class="actions" style="margin-top:9px"><button class="btn secondary" onclick="aiAnalyzeV35()">Analyze</button><button class="btn accent" onclick="aiApplyAllSafe()">Apply All Safe</button></div>
+</div>
+<div id="aiResult"></div>
+<div id="sz-ai-chat" class="sz-ai-chat">
+  <div class="sz-ai-chat-head"><div><b>AI Chat Copilot</b><small>Ask anything about your billing, payments, customers or app.</small></div><span>● Online</span></div>
+  <div id="sz-ai-chat-log" class="sz-ai-chat-log"><div class="sz-ai-msg bot"><b>AI Copilot</b><span>Assalam-o-Alaikum! Aap mujhe command de sakte hain, jaise <em>"pending bills check karo"</em>, <em>"new invoice banao"</em>, <em>"data problems fix karo"</em> ya <em>"mujhe business summary do"</em>.</span></div></div>
+  <div class="sz-ai-chat-suggestions"><button type="button" onclick="szAiChatQuick('Aaj meri business summary do')">Business Summary</button><button type="button" onclick="szAiChatQuick('Pending bills check karo')">Pending Bills</button><button type="button" onclick="szAiChatQuick('Data problems scan karo')">Scan Problems</button><button type="button" onclick="szAiChatQuick('Mere liye safe improvements suggest karo')">Suggest Improvements</button></div>
+  <div class="sz-ai-chat-input"><input id="sz-ai-chat-input" placeholder="Type a command or question…" autocomplete="off"><button type="button" onclick="szAiChatSend()">Send</button></div>
+</div>
+</section>
+
+<section id="printPage" class="page"><div id="printContent"></div></section>
+</main>
+
+</div>
+
+<div class="menu-backdrop" id="menuBackdrop" onclick="closeFeatureMenu()"></div>
+<aside class="side-drawer" id="featureDrawer" aria-label="All features">
+  <div class="drawer-head"><div><div class="drawer-label">SZ BILLING</div><div class="drawer-title">All Features</div></div><button class="btn secondary" onclick="closeFeatureMenu()">×</button></div>
+  <div class="drawer-group">
+    <div class="drawer-label">MAIN</div>
+    <button class="drawer-item" onclick="drawerGo('home')"><span class="drawer-icon">⌂</span><span><b>Dashboard</b><br><small class="muted">Overview & recent activity</small></span></button>
+    <button class="drawer-item" onclick="drawerGo('billing')"><span class="drawer-icon">🧾</span><span><b>Billing</b><br><small class="muted">Create and edit invoice</small></span></button>
+    <button class="drawer-item" onclick="drawerGo('history')"><span class="drawer-icon">🕘</span><span><b>Invoice History</b><br><small class="muted">Saved bills, open, edit & PDF</small></span></button>
+  </div>
+  <div class="drawer-group">
+    <div class="drawer-label">BUSINESS</div>
+    <button class="drawer-item" onclick="drawerGo('customers')"><span class="drawer-icon">👥</span><span><b>Customers</b><br><small class="muted">Customer records</small></span></button>
+    <button class="drawer-item" onclick="drawerGo('products')"><span class="drawer-icon">📦</span><span><b>Products</b><br><small class="muted">Items, units & rates</small></span></button>
+    <button class="drawer-item" onclick="drawerGo('quotations')"><span class="drawer-icon">📋</span><span><b>Quotations</b><br><small class="muted">Create & manage quotations</small></span></button>
+  </div>
+  <div class="drawer-group">
+    <div class="drawer-label">TOOLS</div>
+    <button class="drawer-item" onclick="drawerGo('whatsapp')"><span class="drawer-icon">💬</span><span><b>WhatsApp</b><br><small class="muted">Sharing & WhatsApp history</small></span></button>
+    <button class="drawer-item" onclick="drawerGo('ai')"><span class="drawer-icon">✨</span><span><b>AI Copilot</b><br><small class="muted">Recommendations & actions</small></span></button>
+    <button class="drawer-item" onclick="drawerGo('settings')"><span class="drawer-icon">⚙</span><span><b>Settings</b><br><small class="muted">Company, theme & backup</small></span></button>
+  </div>
+</aside>
+<div class="modal" id="modal"><div class="sheet"><button class="x" onclick="closeModal()">×</button><div id="modalBody"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY='sz_billing_v3';
+const UNITS=['PCS','FT / Feet','Meter','Box','Set','Hour','Other'];
+let db={customers:[],products:[],quotations:[],invoices:[],history:[],settings:{name:'SZ Billing',phone:'',address:'',terms:'All prices are subject to final site confirmation. Installation/workmanship terms as agreed with customer.',logo:'logo-master.png',theme:'slate'}};
+let qEdit=null,iEdit=null;
+
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x)db=x}catch(e){};db.settings=db.settings||{};db.settings.theme=db.settings.theme||'slate';applyTheme();try{renderAll()}catch(e){console.error(e);toast('App loaded with saved data')}setTimeout(()=>{const s=document.getElementById('splash');if(s)s.classList.add('hide')},850);setTimeout(()=>{try{cloudInit()}catch(e){console.error(e)}},200)}
+function save(){localStorage.setItem(KEY,JSON.stringify(db));renderAll();try{cloudQueueSave()}catch(e){console.error(e)}}
+function applyTheme(){document.body.classList.remove('theme-slate','theme-blue','theme-green','theme-purple','theme-gold');document.body.classList.add('theme-'+(db.settings.theme||'slate'))}
+function setTheme(t){db.settings.theme=t;applyTheme();save();toast('Theme changed')}
+function money(n){return 'Rs. '+Number(n||0).toLocaleString('en-PK',{maximumFractionDigits:2})}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function toast(t){let e=document.getElementById('toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',1800)}
+function openBilling(){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active','printing'));let page=document.getElementById('billing');if(!page)return;page.classList.add('active');document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page==='billing'));billingMode='invoice';qEdit=null;if(!iEdit||!iEdit.id&&!iEdit.items.length){newInvoice();}else{renderBilling();}window.scrollTo(0,0);}
+function openPage(id){if(id==='billing'){openBilling();return}document.querySelectorAll('.page').forEach(p=>p.classList.remove('active','printing'));let page=document.getElementById(id);if(!page)return;page.classList.add('active');document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));window.scrollTo(0,0);if(id==='whatsapp')renderWA();if(id==='settings')loadSettings();}
+function openModal(html){document.getElementById('modalBody').innerHTML=html;document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+
+function renderAll(){const top=document.getElementById('topLogo');if(top)top.src=db.settings.logo||'logo-master.png';renderDashboard();renderCustomers();renderProducts();renderBilling();renderWA()}
+function renderDashboard(){let pending=db.invoices.reduce((a,x)=>a+Math.max(0,Number(x.total)-Number(x.paid)),0);document.getElementById('sCustomers').textContent=db.customers.length;document.getElementById('sInvoices').textContent=db.invoices.length;document.getElementById('sPending').textContent=money(pending);let h=db.history.slice(-6).reverse();document.getElementById('recent').innerHTML=h.length?h.map(x=>`<div class="item"><div><b>${esc(x.type)}</b><div class="muted small">${esc(x.customer)} • ${esc(x.date)}</div></div><b>${money(x.amount)}</b></div>`).join(''):'<div class="empty">No activity yet.</div>'}
+
+function openCustomer(id=null){let c=db.customers.find(x=>x.id===id)||{name:'',wa:'',address:''};openModal(`<h2>${id?'Edit':'Add'} Customer</h2><div class="row"><div><label>Name</label><input id="mName" value="${esc(c.name)}"></div><div><label>WhatsApp Number</label><input id="mWa" value="${esc(c.wa)}" placeholder="923001234567"></div></div><div class="actions"><button type="button" class="btn secondary" onclick="pickCustomerContact()">📱 Add from Contacts</button><span class="muted small">Select a saved contact to fill name & phone.</span></div><div style="margin-top:10px"><label>Address</label><textarea id="mAddr">${esc(c.address)}</textarea></div><div class="actions"><button type="button" class="btn" onclick="saveCustomer('${id||''}')">Save Customer</button></div>`)}
+async function pickCustomerContact(){
+  if(!('contacts' in navigator) || !navigator.contacts?.select){return toast('Contacts selection is not supported on this browser. Use Add Customer manually.')}
+  try{
+    const contacts=await navigator.contacts.select(['name','tel'],{multiple:false});
+    const x=contacts&&contacts[0];
+    if(!x)return;
+    const name=Array.isArray(x.name)?x.name[0]||'':(x.name||'');
+    const tel=Array.isArray(x.tel)?x.tel[0]||'':(x.tel||'');
+    if(name){const e=document.getElementById('mName');if(e)e.value=name;}
+    if(tel){const e=document.getElementById('mWa');if(e)e.value=tel.replace(/[^0-9+]/g,'');}
+    toast('Contact selected');
+  }catch(e){if(e&&e.name==='AbortError')return;toast('Could not access contacts. Please allow contact access.')}
+}
+function saveCustomer(id){let name=document.getElementById('mName').value.trim();if(!name)return toast('Customer name required');let c={id:id||crypto.randomUUID(),name,wa:document.getElementById('mWa').value.trim(),address:document.getElementById('mAddr').value.trim()};if(id)db.customers=db.customers.map(x=>x.id===id?c:x);else db.customers.push(c);closeModal();save();toast('Customer saved')}
+function renderCustomers(){let q=(document.getElementById('customerSearch')?.value||'').toLowerCase();let a=db.customers.filter(c=>(c.name+c.wa+c.address).toLowerCase().includes(q));document.getElementById('customerList').innerHTML=a.length?a.map(c=>`<div class="item"><div><b>${esc(c.name)}</b><div class="muted small">${esc(c.wa||'No WhatsApp')}<br>${esc(c.address||'No address')}</div></div><div class="actions" style="margin:0"><button class="btn secondary" onclick="openCustomer('${c.id}')">Edit</button><button class="btn danger" onclick="delCustomer('${c.id}')">Delete</button></div></div>`).join(''):'<div class="empty">No customers.</div>'}
+function delCustomer(id){if(confirm('Delete customer?')){db.customers=db.customers.filter(x=>x.id!==id);save()}}
+
+function openProduct(id=null){let p=db.products.find(x=>x.id===id)||{name:'',unit:'PCS',rate:0};openModal(`<h2>${id?'Edit':'Add'} Product</h2><div><label>Product / Item Name</label><input id="pName" value="${esc(p.name)}"></div><div class="row" style="margin-top:10px"><div><label>Unit</label><select id="pUnit">${UNITS.map(u=>`<option ${u===p.unit?'selected':''}>${u}</option>`).join('')}</select></div><div><label>Rate</label><input id="pRate" type="number" step="0.01" value="${p.rate}"></div></div><div class="actions"><button class="btn" onclick="saveProduct('${id||''}')">Save Product</button></div>`)}
+function saveProduct(id){let name=document.getElementById('pName').value.trim();if(!name)return toast('Product name required');let p={id:id||crypto.randomUUID(),name,unit:document.getElementById('pUnit').value,rate:Number(document.getElementById('pRate').value)||0};if(id)db.products=db.products.map(x=>x.id===id?p:x);else db.products.push(p);closeModal();save();toast('Product saved')}
+function renderProducts(){let q=(document.getElementById('productSearch')?.value||'').toLowerCase();let a=db.products.filter(p=>(p.name+p.unit).toLowerCase().includes(q));document.getElementById('productList').innerHTML=a.length?a.map(p=>`<div class="item"><div><b>${esc(p.name)}</b><div class="muted small">${esc(p.unit)} • ${money(p.rate)}</div></div><div class="actions" style="margin:0"><button class="btn secondary" onclick="openProduct('${p.id}')">Edit</button><button class="btn danger" onclick="delProduct('${p.id}')">Delete</button></div></div>`).join(''):'<div class="empty">No products. Add your CCTV cameras, DVR/NVR, cable, connectors, installation etc.</div>'}
+function delProduct(id){if(confirm('Delete product?')){db.products=db.products.filter(x=>x.id!==id);save()}}
+
+function blankItem(){return{id:crypto.randomUUID(),name:'',unit:'PCS',qty:1,rate:0}}
+function newQuotation(){qEdit={id:null,no:'Q-'+Date.now().toString().slice(-7),date:new Date().toISOString().slice(0,10),customerId:'',items:[],discount:0,terms:db.settings.terms};renderQuoteEditor()}
+function newInvoice(){iEdit={id:null,no:'INV-'+Date.now().toString().slice(-7),date:new Date().toISOString().slice(0,10),due:'',customerId:'',items:[],discount:0,paid:0,terms:db.settings.terms,shareAs:'invoice'};renderInvoiceEditor()}
+
+function customerOptions(sel=''){return '<option value="">Select customer</option>'+db.customers.map(c=>`<option value="${c.id}" ${c.id===sel?'selected':''}>${esc(c.name)}${c.wa?' • '+esc(c.wa):''}</option>`).join('')}
+function productOptions(sel=''){return '<option value="">Custom item</option>'+db.products.map(p=>`<option value="${p.id}" ${p.id===sel?'selected':''}>${esc(p.name)} • ${esc(p.unit)}</option>`).join('')}
+function itemRows(obj,prefix){return obj.items.map((it,idx)=>`<tr><td><button class="btn secondary" onclick="editDocItem('${prefix}',${idx})" style="margin-bottom:5px">Edit</button><div><b>${esc(it.name||'Custom item')}</b></div></td><td><span class="badge">${esc(it.unit)}</span></td><td>${it.qty}</td><td>${money(it.rate)}</td><td class="lineTotal">${money(it.qty*it.rate)}</td><td><button class="btn danger" onclick="${prefix}Remove(${idx})">×</button></td></tr>`).join('')}
+function calc(obj){let sub=obj.items.reduce((a,i)=>a+Number(i.qty||0)*Number(i.rate||0),0);return{sub,disc:Number(obj.discount||0),total:Math.max(0,sub-Number(obj.discount||0))}}
+function updateQuoteTotals(){if(!qEdit)return;let c=calc(qEdit);document.getElementById('qSubtotal').textContent=money(c.sub);document.getElementById('qDisc').textContent=money(c.disc);document.getElementById('qTotal').textContent=money(c.total);document.querySelectorAll('#quotationEditor .lineTotal').forEach((e,idx)=>{let it=qEdit.items[idx];if(it)e.textContent=money(Number(it.qty||0)*Number(it.rate||0))})}
+function updateInvoiceTotals(){if(!iEdit)return;let c=calc(iEdit),p=Math.max(0,c.total-Number(iEdit.paid||0));document.getElementById('iTotal').textContent=money(c.total);document.getElementById('iPaid').textContent=money(iEdit.paid);document.getElementById('iPending').textContent=money(p);document.querySelectorAll('#invoiceEditor .lineTotal').forEach((e,idx)=>{let it=iEdit.items[idx];if(it)e.textContent=money(Number(it.qty||0)*Number(it.rate||0))})}
+function renderQuoteEditor(){let e=document.getElementById('quotationEditor');if(!qEdit){e.innerHTML='';return}let c=calc(qEdit);e.innerHTML=`<div class="card"><h3>Quotation ${esc(qEdit.no)}</h3><div class="row"><div><label>Customer</label><select onchange="qEdit.customerId=this.value">${customerOptions(qEdit.customerId)}</select></div><div><label>Date</label><input type="date" value="${qEdit.date}" onchange="qEdit.date=this.value"></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Item</th><th>Unit</th><th>Qty</th><th>Rate</th><th>Total</th><th></th></tr></thead><tbody>${itemRows(qEdit,'q')}</tbody></table></div><div class="actions"><button class="btn secondary" onclick="addDocItem('quote')">+ Add Item</button></div><div class="row"><div><label>Discount</label><input id="qDiscount" type="number" inputmode="decimal" step="0.01" value="${qEdit.discount}" oninput="qEdit.discount=Number(this.value)||0;updateQuoteTotals()"></div><div><label>Terms</label><textarea oninput="qEdit.terms=this.value">${esc(qEdit.terms)}</textarea></div></div><div class="editor-summary"><b>Subtotal:</b> <span id="qSubtotal">${money(c.sub)}</span> &nbsp; <b>Discount:</b> <span id="qDisc">${money(c.disc)}</span> &nbsp; <b>Total:</b> <span id="qTotal">${money(c.total)}</span></div><div class="actions"><button class="btn" onclick="saveQuote()">Save Quotation</button><button class="btn secondary" onclick="viewCurrent('quote')">View</button><button class="btn accent" onclick="printDoc('quote')">Print / PDF</button><button class="btn ok" onclick="quoteWA()">WhatsApp</button></div></div>`}
+function qPick(i,v){let p=db.products.find(x=>x.id===v);if(p){Object.assign(qEdit.items[i],{productId:p.id,name:p.name,unit:p.unit,rate:p.rate});renderQuoteEditor()}}
+function qSet(i,k,v){qEdit.items[i][k]=(k==='qty'||k==='rate')?Number(v)||0:v;updateQuoteTotals()}
+function qRemove(i){qEdit.items.splice(i,1);if(!qEdit.items.length)qEdit.items.push(blankItem());renderQuoteEditor()}
+function renderInvoiceEditor(){renderBilling();}
+function iPick(i,v){let p=db.products.find(x=>x.id===v);if(p){Object.assign(iEdit.items[i],{productId:p.id,name:p.name,unit:p.unit,rate:p.rate});renderInvoiceEditor()}}
+function iSet(i,k,v){iEdit.items[i][k]=(k==='qty'||k==='rate')?Number(v)||0:v;updateInvoiceTotals()}
+function iRemove(i){iEdit.items.splice(i,1);if(!iEdit.items.length)iEdit.items.push(blankItem());renderInvoiceEditor()}
+function addDocItem(type){
+  type=type==='quote'?'quote':'invoice';
+  showSavedItemPicker(type);
+}
+function editDocItem(prefix,idx){openItemEditor(prefix==='q'?'quote':'invoice',idx)}
+function showSavedItemPicker(type){
+  let products=db.products||[];
+  let rows=products.length?products.map(p=>`<button class="pick-item" onclick="selectSavedItem('${type}','${p.id}')"><span><b>${esc(p.name)}</b><small>${esc(p.unit)} • ${money(p.rate)}</small></span><strong>Use</strong></button>`).join(''):`<div class="empty">No saved products yet. Add a product in Products first, or use Custom Item below.</div>`;
+  openModal(`<h2>Select Item / Product</h2><p class="muted">Pehle saved item select karein. Phir aglay step mein name, unit, quantity aur price edit kar sakte hain.</p><div class="pick-list">${rows}</div><div class="actions"><button class="btn" onclick="openItemEditor('${type}',null)">＋ Custom Item</button><button class="btn secondary" onclick="closeModal()">Cancel</button></div>`);
+}
+function selectSavedItem(type,productId){
+  let obj=type==='quote'?qEdit:iEdit;
+  let p=db.products.find(x=>x.id===productId);
+  if(!obj||!p)return;
+  let item={id:crypto.randomUUID(),productId:p.id,name:p.name,unit:p.unit,qty:1,rate:Number(p.rate)||0};
+  obj.items.push(item);
+  openItemEditor(type,obj.items.length-1);
+}
+function openItemEditor(type,idx){
+  let obj=type==='quote'?qEdit:iEdit;if(!obj)return;
+  let it=idx===null?blankItem():obj.items[idx];
+  openModal(`<h2>${idx===null?'Add':'Edit'} Item</h2>
+  <div class="item-editor-note">Selected item ki details yahan change karein:</div>
+  <div><label>Item / Product Name</label><input id="docItemName" value="${esc(it.name)}" autocomplete="off"></div>
+  <div class="row" style="margin-top:10px"><div><label>Unit</label><select id="docItemUnit">${UNITS.map(u=>`<option ${u===it.unit?'selected':''}>${u}</option>`).join('')}</select></div><div><label>Quantity</label><input id="docItemQty" type="number" inputmode="decimal" step="0.01" value="${it.qty}" autocomplete="off"></div></div>
+  <div style="margin-top:10px"><label>Rate / Price</label><input id="docItemRate" type="number" inputmode="decimal" step="0.01" value="${it.rate}" autocomplete="off"></div>
+  <div class="actions"><button class="btn" onclick="saveDocItem('${type}',${idx===null?'null':idx})">Save Item</button><button class="btn secondary" onclick="closeModal()">Cancel</button></div>`);
+  setTimeout(()=>document.getElementById('docItemName')?.focus(),120);
+}
+function saveDocItem(type,idx){
+  let obj=type==='quote'?qEdit:iEdit;if(!obj)return;
+  let name=document.getElementById('docItemName').value.trim();if(!name)return toast('Item name required');
+  let it={id:idx===null?crypto.randomUUID():obj.items[idx].id,name,
+    unit:document.getElementById('docItemUnit').value,
+    qty:Number(document.getElementById('docItemQty').value)||0,
+    rate:Number(document.getElementById('docItemRate').value)||0};
+  if(idx===null)obj.items.push(it);else obj.items[idx]=it;
+  closeModal();renderBilling();
+  if(type==='invoice')autoSaveCurrentInvoice();
+}
+function saveQuote(){let c=calc(qEdit),cu=db.customers.find(x=>x.id===qEdit.customerId);if(!cu)return toast('Select customer');let obj={...qEdit,total:c.total,customer:cu.name};if(qEdit.id)db.quotations=db.quotations.map(x=>x.id===qEdit.id?obj:x);else{obj.id=crypto.randomUUID();db.quotations.push(obj)}db.history.push({type:'Quotation',customer:cu.name,amount:c.total,date:new Date().toLocaleString()});qEdit=null;save();toast('Quotation saved');renderBilling()}
+function renderQuotes(){document.getElementById('quotationList').innerHTML=db.quotations.length?db.quotations.slice().reverse().map(q=>`<div class="item"><div><b>${esc(q.no)}</b><div class="muted small">${esc(q.customer)} • ${esc(q.date)}</div></div><div><b>${money(q.total)}</b><div class="actions" style="margin:4px 0 0"><button class="btn secondary" onclick="editQuote('${q.id}')">Open</button><button class="btn secondary" onclick="viewSaved('quote','${q.id}')">View</button><button class="btn accent" onclick="printSaved('quote','${q.id}')">PDF</button></div></div></div>`).join(''):'<div class="empty">No quotations yet.</div>'}
+function editQuote(id){qEdit=db.quotations.find(x=>x.id===id);renderQuoteEditor();openPage('quotations');window.scrollTo(0,document.body.scrollHeight)}
+function quoteWA(){if(!qEdit)return toast('Open quotation first');let cu=db.customers.find(x=>x.id===qEdit.customerId),c=calc(qEdit);if(!cu)return toast('Select customer');if(!cu.wa)return toast('Customer WhatsApp number missing');let msg='Assalam-o-Alaikum '+cu.name+',%0A%0AQuotation '+qEdit.no+'%0ATotal: '+money(c.total)+'%0A%0AThank you.%0A'+(db.settings.name||'SZ Billing');window.location.href='https://wa.me/'+cu.wa.replace(/\D/g,'')+'?text='+msg;db.history.push({type:'WhatsApp',waAction:'Quotation',detail:'WhatsApp chat opened • '+cu.name,customer:cu.name,amount:c.total,date:new Date().toLocaleString()});save();renderWA();}
+
+function saveInvoice(){
+  if(!iEdit)return toast('Open Invoice first');
+  let c=calc(iEdit),cu=db.customers.find(x=>x.id===iEdit.customerId);
+  if(!cu)return toast('Select customer');
+  let obj={...iEdit,total:c.total,paid:Number(iEdit.paid||0),pending:Math.max(0,c.total-Number(iEdit.paid||0)),customer:cu.name,date:iEdit.date||new Date().toISOString().slice(0,10)};
+  if(iEdit.id){db.invoices=db.invoices.map(x=>x.id===iEdit.id?obj:x)}else{obj.id=crypto.randomUUID();db.invoices.push(obj)}
+  db.history.push({type:'Invoice Saved',customer:cu.name,amount:c.total,date:new Date().toLocaleString()});
+  iEdit={...obj};save();toast('Invoice saved');renderBilling();
+}
+function invoiceWA(){
+  if(!iEdit)return toast('Open Invoice first');
+  const cu=db.customers.find(x=>x.id===iEdit.customerId);
+  if(!cu)return toast('Select customer');
+  const phone=String(cu.wa||'').replace(/\D/g,'');
+  if(!phone)return toast('Customer WhatsApp number missing');
+  const kind=iEdit.shareAs==='quotation'?'quotation':'invoice';
+  const title=kind==='quotation'?'Quotation':'Invoice';
+  const c=calc(iEdit),paid=Number(iEdit.paid||0),pending=Math.max(0,c.total-paid);
+  const msg=`Assalam-o-Alaikum ${cu.name},\n\nPlease find your ${title.toLowerCase()} ${iEdit.no}.\nTotal: ${money(c.total)}${kind==='invoice'?`\nReceived: ${money(paid)}\nPending: ${money(pending)}`:''}\n\nThank you for choosing ${db.settings.name||'SZ Billing'}.`;
+  // Always prepare the PDF first, then open this customer's WhatsApp chat directly.
+  try{
+    const blob=makeInvoicePdf(iEdit,kind);
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`${title}-${iEdit.no}.pdf`;
+    a.style.display='none';
+    document.body.appendChild(a); a.click(); a.remove();
+    iEdit.shareAs=kind;
+    db.history.push({type:title+' WhatsApp PDF',customer:cu.name,amount:c.total,date:new Date().toLocaleString()});
+    save();
+  }catch(e){ console.warn('PDF prepare failed',e); }
+  const waUrl='https://wa.me/'+phone+'?text='+encodeURIComponent(msg);
+  // Direct navigation is intentional: this makes the WhatsApp option open the saved customer's chat reliably.
+  window.location.href=waUrl;
+}
+function pdfEsc(s){return String(s??'').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/\r?\n/g,' ')}
+function makeInvoicePdf(obj,kind){
+  const cu=db.customers.find(x=>x.id===obj.customerId)||{name:obj.customer||'',wa:'',address:''};
+  const c=calc(obj), paid=kind==='invoice'?Number(obj.paid||0):0, pending=kind==='invoice'?Math.max(0,c.total-paid):0;
+  const title=kind==='quotation'?'QUOTATION':'INVOICE';
+  let lines=[]; const add=(y,t,size=10)=>lines.push(`BT /F1 ${size} Tf 50 ${y} Td (${pdfEsc(t)}) Tj ET`);
+  add(800, title, 22); add(770, db.settings.name||'SZ Billing', 13); add(748, `No: ${obj.no}   Date: ${obj.date}`, 10);
+  if(kind==='invoice') add(730, `Due: ${obj.due||'—'}`, 10);
+  add(700, `Customer: ${cu.name}`, 11); if(cu.wa)add(682, `WhatsApp: ${cu.wa}`, 9); if(cu.address)add(664, `Address: ${cu.address}`, 9);
+  add(630, 'Item                         Unit       Qty        Rate        Amount', 9);
+  lines.push('0.5 w 50 615 m 545 615 l S');
+  let y=595;
+  obj.items.forEach((it,i)=>{if(y<120){return} add(y, `${i+1}. ${String(it.name).slice(0,28)}   ${it.unit}   ${it.qty}   ${money(it.rate)}   ${money(it.qty*it.rate)}`, 8); y-=20});
+  y=Math.max(y,180);
+  add(y, `Subtotal: ${money(c.sub)}`, 10); y-=20; add(y, `Discount: ${money(c.disc)}`, 10); y-=22; add(y, `TOTAL: ${money(c.total)}`, 13);
+  if(kind==='invoice'){y-=22;add(y,`Received: ${money(paid)}`,10);y-=20;add(y,`Pending: ${money(pending)}`,10)}
+  y-=30; add(y, `Terms: ${String(obj.terms||db.settings.terms||'').slice(0,140)}`, 8);
+  y-=28; add(y, db.settings.phone||'', 9);
+  const content=lines.join('\n'); const contentLen=new TextEncoder().encode(content).length;
+  const objs=[]; const offsets=[0];
+  function obj(n,body){return `${n} 0 obj\n${body}\nendobj\n`}
+  objs[1]=obj(1,'<< /Type /Catalog /Pages 2 0 R >>');
+  objs[2]=obj(2,'<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  objs[3]=obj(3,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>');
+  objs[4]=obj(4,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+  objs[5]=obj(5,`<< /Length ${contentLen} >>\nstream\n${content}\nendstream`);
+  let pdf='%PDF-1.4\n'; let offs=[];
+  for(let i=1;i<=5;i++){offs[i]=pdf.length;pdf+=objs[i]}
+  const xref=pdf.length; pdf+=`xref\n0 6\n0000000000 65535 f \n`;
+  for(let i=1;i<=5;i++)pdf+=String(offs[i]).padStart(10,'0')+' 00000 n \n';
+  pdf+=`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return new Blob([pdf],{type:'application/pdf'});
+}
+async function shareInvoiceAs(kind){
+  const obj=iEdit;if(!obj)return toast('Open Invoice first');
+  const cu=db.customers.find(x=>x.id===obj.customerId);if(!cu)return toast('Select customer');
+  if(!cu.wa)return toast('Customer WhatsApp number missing');
+  const title=kind==='quotation'?'Quotation':'Invoice';
+  const c=calc(obj),paid=Number(obj.paid||0),pending=Math.max(0,c.total-paid);
+  const msg=`Assalam-o-Alaikum ${cu.name},\n\nPlease find attached your ${title.toLowerCase()} ${obj.no}.\nTotal: ${money(c.total)}${kind==='invoice'?`\nReceived: ${money(paid)}\nPending: ${money(pending)}`:''}\n\nThank you for choosing ${db.settings.name||'SZ Billing'}.`;
+  const blob=makeInvoicePdf(obj,kind),fileName=`${title}-${obj.no}.pdf`;
+  let file=null;try{file=new File([blob],fileName,{type:'application/pdf'});}catch(e){}
+
+  // IMPORTANT: keep this call directly inside the user's click chain.
+  // If the installed browser supports file sharing, Android's share sheet can send the PDF to WhatsApp.
+  if(file && typeof navigator.share==='function'){
+    try{
+      if(typeof navigator.canShare!=='function' || navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:`${title} ${obj.no}`,text:msg});
+        obj.shareAs=kind;db.history.push({type:'WhatsApp',waAction:title+' Bill PDF',detail:'Shared to WhatsApp • '+cu.name,customer:cu.name,amount:c.total,date:new Date().toLocaleString()});save();renderWA();
+        return;
+      }
+    }catch(e){
+      if(e&&e.name==='AbortError')return;
+    }
+  }
+
+  // WebView/older Android fallback: create the PDF first, then open the WhatsApp chat.
+  // A web page cannot programmatically attach a local file to wa.me; the PDF is therefore saved for manual attachment.
+  try{
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=fileName;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
+    obj.shareAs=kind;db.history.push({type:'WhatsApp',waAction:title+' Bill PDF',detail:'Shared to WhatsApp • '+cu.name,customer:cu.name,amount:c.total,date:new Date().toLocaleString()});save();renderWA();
+    const phone=String(cu.wa).replace(/\D/g,'');
+    setTimeout(()=>{
+      URL.revokeObjectURL(url);
+      // Prefer the WhatsApp app intent; fall back to wa.me if the app is unavailable.
+      const intent='intent://send?phone='+phone+'&text='+encodeURIComponent(msg)+'#Intent;scheme=whatsapp;package=com.whatsapp;end';
+      try{window.location.href=intent;}catch(e){window.location.href='https://wa.me/'+phone+'?text='+encodeURIComponent(msg)}
+      setTimeout(()=>{if(document.visibilityState==='visible')window.location.href='https://wa.me/'+phone+'?text='+encodeURIComponent(msg)},900);
+    },250);
+  }catch(e){toast('Could not prepare PDF for WhatsApp');}
+}
+function waHistoryRows(){return db.history.filter(x=>x.waAction||String(x.type||'').includes('WhatsApp')).slice().reverse().map(x=>{let action=x.waAction||x.type||'WhatsApp';let detail=x.detail||'';return `<div class="item"><div><b>${esc(action)}</b><div class="muted small">Customer: ${esc(x.customer||'—')} • ${esc(x.date||'')}</div>${detail?`<div class="muted small">${esc(detail)}</div>`:''}</div><b>${x.amount!=null?money(x.amount):''}</b></div>`}).join('')||'<div class="empty">No WhatsApp history.</div>'}
+function renderWA(){let s=document.getElementById('waCustomer');if(!s)return;s.innerHTML=customerOptions(window.waCustomer||'');if(!window.waCustomer&&db.customers[0]){window.waCustomer=db.customers[0].id;s.value=window.waCustomer}waLoad();let h=document.getElementById('waHistory');if(h)h.innerHTML=waHistoryRows()}
+function showAllWAHistory(){openModal(`<h2>WhatsApp History — All Customers</h2><div class="card" style="max-height:60vh;overflow:auto">${waHistoryRows()}</div>`)}
+function waLoad(){let s=document.getElementById('waCustomer');window.waCustomer=s?s.value:'';let cu=db.customers.find(x=>x.id===window.waCustomer),el=document.getElementById('waInfo');if(!el)return;if(!cu){el.innerHTML='<div class="empty">Select customer.</div>';return}let inv=db.invoices.filter(x=>x.customerId===cu.id).slice(-1)[0];el.innerHTML=`<b>${esc(cu.name)}</b><div class="muted small">${esc(cu.wa||'No WhatsApp')}</div>${inv?`<div style="margin-top:8px">Latest Invoice <b>${esc(inv.no)}</b><br>Total: <b>${money(inv.total)}</b> • Paid: <b>${money(inv.paid)}</b> • Pending: <b>${money(inv.pending)}</b></div>`:''}`}
+function openWA(){let cu=db.customers.find(x=>x.id===window.waCustomer);if(!cu)return toast('Select customer');if(!cu.wa)return toast('Customer WhatsApp number missing');window.location.href='https://wa.me/'+cu.wa.replace(/\D/g,'')}
+function pendingPost(){
+  let cu=iEdit?db.customers.find(x=>x.id===iEdit.customerId):db.customers.find(x=>x.id===window.waCustomer);
+  let inv=iEdit||(cu?db.invoices.filter(x=>x.customerId===cu.id).slice(-1)[0]:null);
+  if(!cu||!inv)return toast('Select customer and invoice first');
+  if(!cu.wa)return toast('Customer WhatsApp number missing');
+  let c=calc(inv),paid=Number(inv.paid||0),pending=Math.max(0,c.total-paid);
+  if(pending<=0)return toast('This invoice has no pending payment');
+  openModal(`<h2>Pending Payment Post</h2><p class="muted">${esc(cu.name)} • Invoice ${esc(inv.no)}</p><div class="card" style="margin:12px 0;padding:14px"><b>What do you want to send?</b><div class="actions" style="margin-top:14px"><button class="btn accent" onclick="pendingPostSend(false)">🖼️ Pending Post Only</button><button class="btn ok" onclick="pendingPostSend(true)">🖼️ + 📄 Post & Bill PDF</button></div></div>`);
+}
+
+function buildPendingPostBlob(cu,inv,pending,paid,total){
+  const pst=(db.settings&&db.settings.pendingPostTheme)||'professional'; const pal={professional:['#0b1f3a','#165dff','#f3f8ff','#cfe0f4'],minimal:['#334155','#64748b','#f8fafc','#e2e8f0'],emerald:['#14532d','#16a34a','#f0fdf4','#bbf7d0'],midnight:['#111827','#4f46e5','#eef2ff','#c7d2fe']}[pst]||['#0b1f3a','#165dff','#f3f8ff','#cfe0f4'];
+  return new Promise(resolve=>{
+    let canvas=document.createElement('canvas');canvas.width=1200;canvas.height=1500;let g=canvas.getContext('2d');
+    const grad=g.createLinearGradient(0,0,1200,1500);grad.addColorStop(0,'#f7faff');grad.addColorStop(.55,'#ffffff');grad.addColorStop(1,'#eef3f8');g.fillStyle=grad;g.fillRect(0,0,1200,1500);
+    g.fillStyle=pal[0];g.fillRect(0,0,1200,300);g.fillStyle='#1d70d6';g.fillRect(0,292,1200,8);
+    g.fillStyle='#ffffff';g.font='bold 24px Arial';g.fillText(String(db.settings.name||'SZ BILLING').slice(0,32).toUpperCase(),78,82);
+    g.fillStyle='#a9c7e8';g.font='18px Arial';g.fillText('CUSTOMER ACCOUNTS • PAYMENT NOTICE',78,115);
+    g.fillStyle='#ffffff';g.font='bold 50px Arial';g.fillText('Payment Reminder',78,205);
+    g.fillStyle='#c9d8e9';g.font='20px Arial';g.fillText('A professional courtesy regarding your outstanding balance',78,242);
+    g.fillStyle='#ffffff';g.beginPath();g.roundRect(60,345,1080,185,26);g.fill();g.strokeStyle='#dbe4ee';g.lineWidth=2;g.stroke();
+    g.fillStyle='#1d70d6';g.beginPath();g.arc(125,437,42,0,Math.PI*2);g.fill();g.fillStyle='#ffffff';g.font='bold 30px Arial';g.textAlign='center';g.fillText(String(cu.name||'C').trim().charAt(0).toUpperCase(),125,447);g.textAlign='left';
+    g.fillStyle='#718096';g.font='16px Arial';g.fillText('ACCOUNT HOLDER',195,408);g.fillStyle=pal[0];g.font='bold 31px Arial';g.fillText(String(cu.name||'Valued Customer').slice(0,32),195,450);g.fillStyle='#718096';g.font='18px Arial';g.fillText('Invoice #'+String(inv.no||''),195,485);
+    g.fillStyle=pal[2];g.beginPath();g.roundRect(60,565,1080,270,26);g.fill();g.strokeStyle=pal[3];g.stroke();g.fillStyle='#52657b';g.font='bold 17px Arial';g.fillText('OUTSTANDING BALANCE',100,625);g.fillStyle=pal[0];g.font='bold 67px Arial';g.fillText(money(pending),100,715);g.fillStyle='#718096';g.font='18px Arial';g.fillText('Amount currently due',100,755);g.fillStyle='#d8e3ef';g.fillRect(600,605,1,175);g.fillStyle='#66788e';g.font='17px Arial';g.fillText('TOTAL BILL',655,635);g.fillStyle=pal[0];g.font='bold 26px Arial';g.fillText(money(total),655,680);g.fillStyle='#66788e';g.font='17px Arial';g.fillText('RECEIVED',655,725);g.fillStyle=pal[0];g.font='bold 26px Arial';g.fillText(money(paid),655,770);if(inv.due){g.fillStyle='#1d70d6';g.font='bold 17px Arial';g.fillText('DUE DATE  '+inv.due,100,805)}
+    g.fillStyle=pal[0];g.font='bold 27px Arial';g.fillText('Dear Customer,',75,910);g.fillStyle='#3f5065';g.font='21px Arial';['We appreciate your trust and continued business.','When convenient, please arrange the outstanding payment.','If payment has already been made, kindly share the confirmation','so our accounts record can be updated. Thank you.'].forEach((t,i)=>g.fillText(t,75,955+i*38));
+    g.fillStyle=pal[0];g.beginPath();g.roundRect(60,1165,1080,220,24);g.fill();g.fillStyle='#ffffff';g.font='bold 26px Arial';g.fillText(String(db.settings.name||'SZ BILLING').slice(0,36),100,1225);g.fillStyle='#b8c9dc';g.font='18px Arial';g.fillText('For payment confirmation or account assistance',100,1262);if(db.settings.phone){g.fillStyle='#ffffff';g.font='bold 20px Arial';g.fillText('Contact  '+String(db.settings.phone).slice(0,42),100,1310)}if(db.settings.address){g.fillStyle='#b8c9dc';g.font='17px Arial';g.fillText(String(db.settings.address).slice(0,78),100,1347)}g.fillStyle='#7f93aa';g.font='15px Arial';g.fillText('This notice is a friendly courtesy and not a demand notice.',75,1435);
+    canvas.toBlob(resolve,'image/png');
+  });
+}
+
+async function pendingPostSend(includePdf){
+  closeModal();
+  let cu=iEdit?db.customers.find(x=>x.id===iEdit.customerId):db.customers.find(x=>x.id===window.waCustomer);
+  let inv=iEdit||(cu?db.invoices.filter(x=>x.customerId===cu.id).slice(-1)[0]:null);
+  if(!cu||!inv)return toast('Select customer and invoice first');
+  if(!cu.wa)return toast('Customer WhatsApp number missing');
+  let c=calc(inv),paid=Number(inv.paid||0),pending=Math.max(0,c.total-paid);
+  if(pending<=0)return toast('This invoice has no pending payment');
+  const action=includePdf?'Pending Post + Bill PDF':'Pending Post Only';
+  const msg=`Assalam-o-Alaikum ${cu.name},\n\nPayment reminder for invoice ${inv.no}.\nPending: ${money(pending)}\n\nThank you for your cooperation.`;
+  try{
+    const blob=await buildPendingPostBlob(cu,inv,pending,paid,c.total);
+    if(!blob)throw new Error('post blob unavailable');
+    const postName='Payment-Pending-'+inv.no+'.png';
+    const pdfName='Invoice-'+inv.no+'.pdf';
+    const postFile=(typeof File==='function')?new File([blob],postName,{type:'image/png'}):null;
+    let pdfBlob=null,pdfFile=null;
+    if(includePdf){
+      pdfBlob=makeInvoicePdf(inv,'invoice');
+      if(!pdfBlob)throw new Error('pdf blob unavailable');
+      pdfFile=(typeof File==='function')?new File([pdfBlob],pdfName,{type:'application/pdf'}):null;
+    }
+    if(typeof navigator.share!=='function' || !postFile || (includePdf&&!pdfFile)){
+      throw new Error('Web Share with files is not supported. Open this ZIP app through HTTPS/Chrome.');
+    }
+
+    // First try the requested action as ONE share: both files together.
+    if(includePdf){
+      let multiSupported=false;
+      try{multiSupported=typeof navigator.canShare!=='function'||navigator.canShare({files:[postFile,pdfFile]});}catch(e){multiSupported=false;}
+      if(multiSupported){
+        try{
+          await navigator.share({title:'Payment Reminder',text:msg,files:[postFile,pdfFile]});
+          db.history.push({type:'WhatsApp',waAction:action,detail:'Post + Bill PDF shared together',customer:cu.name,amount:pending,date:new Date().toLocaleString()});
+          save();renderWA();toast('Post + Bill PDF shared');return;
+        }catch(e){if(e&&e.name==='AbortError')return;}
+      }
+
+      // If the browser cannot share two files together, do NOT download them.
+      // Share each real file through the Android/Chrome share sheet instead.
+      try{
+        await navigator.share({title:'Payment Reminder Post',text:msg,files:[postFile]});
+      }catch(e){if(e&&e.name==='AbortError')return;throw e;}
+      try{
+        await navigator.share({title:'Bill PDF '+inv.no,text:msg,files:[pdfFile]});
+      }catch(e){if(e&&e.name==='AbortError')return;throw e;}
+      db.history.push({type:'WhatsApp',waAction:action,detail:'Pending post and Bill PDF shared separately',customer:cu.name,amount:pending,date:new Date().toLocaleString()});
+      save();renderWA();toast('Post + Bill PDF shared');return;
+    }
+
+    await navigator.share({title:'Payment Reminder',text:msg,files:[postFile]});
+    db.history.push({type:'WhatsApp',waAction:action,detail:'Pending post shared',customer:cu.name,amount:pending,date:new Date().toLocaleString()});
+    save();renderWA();toast('Pending post shared');
+  }catch(e){
+    console.error('pendingPostSend error',e);
+    if(e&&e.name==='AbortError')return;
+    toast('File sharing is not supported here. Open the app in Chrome over HTTPS.');
+  }
+}
+
+function docHtml(obj,type){let cu=db.customers.find(x=>x.id===obj.customerId)||{name:obj.customer||'',wa:'',address:''};let c=calc(obj);let paid=type==='invoice'?Number(obj.paid||0):null;let pending=type==='invoice'?Math.max(0,c.total-paid):null;return `<div class="doc"><div class="doc-head"><div><img class="doc-logo" src="${db.settings.logo||'logo-master.png'}"><h1>${type==='invoice'?'INVOICE':'QUOTATION'}</h1></div><div class="doc-meta"><b>${esc(obj.no)}</b><br>Date: ${esc(obj.date)}${type==='invoice'?'<br>Due: '+esc(obj.due||'—'):''}<br><br><b>${esc(db.settings.name)}</b><br>${esc(db.settings.phone)}<br>${esc(db.settings.address)}</div></div><div style="margin-top:15px;font-size:12px"><b>Customer:</b> ${esc(cu.name)}<br>${esc(cu.wa)}<br>${esc(cu.address)}</div><table><thead><tr><th>#</th><th>Item</th><th>Unit</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>${obj.items.map((it,n)=>`<tr><td>${n+1}</td><td>${esc(it.name)}</td><td>${esc(it.unit)}</td><td>${it.qty}</td><td>${money(it.rate)}</td><td>${money(it.qty*it.rate)}</td></tr>`).join('')}</tbody></table><div class="total"><div><span>Subtotal</span><b>${money(c.sub)}</b></div><div><span>Discount</span><b>${money(c.disc)}</b></div><div class="grand"><span>Total</span><b>${money(c.total)}</b></div>${type==='invoice'?`<div><span>Paid</span><b>${money(paid)}</b></div><div><span>Pending</span><b>${money(pending)}</b></div>`:''}</div><div class="terms"><b>Terms & Conditions</b><br>${esc(obj.terms||db.settings.terms)}</div></div>`}
+let billingMode='invoice';
+function activeDoc(){return iEdit}
+function setBillingMode(type){billingMode='invoice';if(!iEdit||iEdit.id){newInvoice()}renderBilling()}
+function newBilling(type){billingMode='invoice';qEdit=null;newInvoice();openPage('billing');renderBilling();window.scrollTo(0,0)}
+function renderBilling(){let el=document.getElementById('billingEditor');if(!el)return;billingMode='invoice';let obj=iEdit;if(obj){renderBillingEditor()}else{el.innerHTML='<div class="card"><div class="empty">Tap + New Invoice to create an invoice.</div></div>'}renderBillingList()}
+
+function renderBillingEditor(){
+  let e=document.getElementById('billingEditor'),obj=iEdit;
+  if(!obj){e.innerHTML='';return}
+  let c=calc(obj),pending=Math.max(0,c.total-Number(obj.paid||0));
+  let rows=obj.items.length?obj.items.map((it,idx)=>`<div class="bill-item-row"><div><b>${esc(it.name||'Custom item')}</b><small>${esc(it.unit)} • Qty ${it.qty} • ${money(it.rate)} each</small></div><strong>${money(it.qty*it.rate)}</strong><div class="actions"><button class="btn secondary" onclick="editDocItem('i',${idx})">Edit</button><button class="btn danger" onclick="iRemove(${idx})">×</button></div></div>`).join(''):`<div class="empty">No item added yet. Tap <b>+ Add Item</b> and select your product.</div>`;
+  e.innerHTML=`<div class="card">
+  <div class="actions" style="margin-top:0"><span class="badge">INVOICE</span><span class="muted">${esc(obj.no)}</span></div>
+  <div class="row" style="margin-top:12px"><div><label>Customer</label><select onchange="iEdit.customerId=this.value">${customerOptions(obj.customerId)}</select></div><div><label>Date</label><input type="date" value="${obj.date}" onchange="iEdit.date=this.value"></div></div>
+  <div class="row" style="margin-top:10px"><div><label>Due Date</label><input type="date" value="${obj.due||''}" onchange="iEdit.due=this.value"></div><div><label>Received / Paid</label><input id="billPaid" type="number" inputmode="decimal" step="0.01" value="${obj.paid||0}" oninput="iEdit.paid=Number(this.value)||0;updateBillingTotals()"></div></div>
+  <div style="margin-top:10px"><label>Share as:</label><select onchange="iEdit.shareAs=this.value"><option value="invoice" ${obj.shareAs!=='quotation'?'selected':''}>Invoice</option><option value="quotation" ${obj.shareAs==='quotation'?'selected':''}>Quotation</option></select></div>
+  <div class="bill-items" id="billingLiveItems"><div class="bill-items-head"><b>Added Items</b><span>${obj.items.length} item${obj.items.length===1?'':'s'}</span></div>${rows}</div>
+  <div class="actions"><button class="btn secondary" onclick="addDocItem('invoice')">+ Add Item</button><button class="btn" onclick="openItemEditor('invoice',null)">+ Custom Item</button></div>
+  <div class="row"><div><label>Discount</label><input id="billDiscount" type="number" inputmode="decimal" step="0.01" value="${obj.discount||0}" oninput="iEdit.discount=Number(this.value)||0;updateBillingTotals()"></div><div><label>Terms & Conditions</label><textarea oninput="iEdit.terms=this.value">${esc(obj.terms||'')}</textarea></div></div>
+  <div class="editor-summary"><b>Subtotal:</b> <span id="billSubtotal">${money(c.sub)}</span> &nbsp; <b>Discount:</b> <span id="billDisc">${money(c.disc)}</span> &nbsp; <b>Total:</b> <span id="billTotal">${money(c.total)}</span> &nbsp; <b>Received:</b> <span id="billPaidShow">${money(obj.paid)}</span> &nbsp; <b>Pending:</b> <span id="billPending">${money(pending)}</span></div>
+  <div class="actions"><button class="btn" onclick="saveBilling()">Save Invoice</button><button class="btn secondary" onclick="viewCurrentBilling()">View</button><button class="btn accent" onclick="printDoc('invoice')">Print / PDF</button><button class="btn ok" onclick="invoiceWA()">WhatsApp</button><button class="btn secondary" onclick="pendingPost()">Pending Post</button></div>
+  </div>`;
+}
+
+function updateBillingTotals(){let obj=activeDoc();if(!obj)return;let c=calc(obj),p=billingMode==='invoice'?Math.max(0,c.total-Number(obj.paid||0)):0;let set=(id,v)=>{let e=document.getElementById(id);if(e)e.textContent=v};set('billSubtotal',money(c.sub));set('billDisc',money(c.disc));set('billTotal',money(c.total));set('billPaidShow',money(obj.paid));set('billPending',money(p));document.querySelectorAll('#billingEditor .lineTotal').forEach((e,idx)=>{let it=obj.items[idx];if(it)e.textContent=money(Number(it.qty||0)*Number(it.rate||0))})}
+function markFullPaidAndSave(){
+  if(!iEdit)return toast('Open Invoice first');
+  const c=calc(iEdit);
+  iEdit.paid=Number(c.total||0);
+  iEdit.pending=0;
+  saveInvoice();
+  toast('Payment marked as Fully Paid');
+}
+function saveBilling(){saveInvoice()}
+function deleteInvoice(id){
+  const inv=db.invoices.find(x=>x.id===id);if(!inv)return toast('Invoice not found');
+  if(!confirm('Delete invoice '+(inv.no||'')+'? This cannot be undone.'))return;
+  db.invoices=db.invoices.filter(x=>x.id!==id);
+  if(iEdit&&iEdit.id===id){iEdit=null;}
+  save();toast('Invoice deleted');renderBilling();
+}
+function renderBillingList(){let el=document.getElementById('billingList');if(!el)return;let arr=db.invoices||[];if(!arr.length){el.innerHTML='<div class="empty">No invoices saved yet.</div>';return}el.innerHTML=arr.slice().reverse().map(x=>`<div class="item"><div><b>${esc(x.no)}</b><div class="muted small">${esc(x.customer||'')} • ${esc(x.date||'')}</div></div><div><b>${money(x.total)}</b><div class="small">${x.pending?money(x.pending)+' pending':'Paid'}</div><div class="actions" style="margin:4px 0 0"><button class="btn secondary" onclick="openSavedBilling('invoice','${x.id}')">Open</button><button class="btn secondary" onclick="viewSaved('invoice','${x.id}')">View</button><button class="btn accent" onclick="printSaved('invoice','${x.id}')">PDF</button>${Number(x.pending||0)>0?`<button class="btn ok" onclick="markSavedInvoicePaid('${x.id}')">✓ Full Paid</button>`:''}<button class="btn danger" onclick="deleteInvoice('${x.id}')">Delete</button></div></div></div>`).join('')}
+function markSavedInvoicePaid(id){
+  const inv=db.invoices.find(x=>x.id===id);
+  if(!inv)return toast('Invoice not found');
+  const total=Number(inv.total||0);
+  if(total<=0)return toast('Invoice total is zero');
+  if(Number(inv.pending||0)<=0)return toast('Invoice is already fully paid');
+  if(!confirm('Mark invoice '+(inv.no||'')+' as Fully Paid?'))return;
+  inv.paid=total; inv.pending=0;
+  db.history.push({type:'Invoice Fully Paid',customer:inv.customer||'',amount:total,date:new Date().toLocaleString()});
+  save(); renderBilling(); renderDashboard(); toast('Invoice marked as Fully Paid');
+}
+function openSavedBilling(type,id){billingMode='invoice';qEdit=null;iEdit=db.invoices.find(x=>x.id===id)||null;openPage('billing');if(iEdit&&iEdit.id)renderBilling();window.scrollTo(0,0)}
+function viewCurrentBilling(){let obj=activeDoc();if(obj)viewDocument(billingMode,obj)}
+function viewSaved(type,id){let obj=(type==='quote'?db.quotations:db.invoices).find(x=>x.id===id);if(obj)viewDocument(type,obj)}
+function viewDocument(type,obj){document.getElementById('printContent').innerHTML='<div class="no-print actions"><button class="btn secondary" onclick="openPage(\'billing\');setBillingMode(\''+type+'\')">← Back to Billing</button><button class="btn accent" onclick="printSaved(\''+type+'\',\''+(obj.id||'')+'\')">Print / PDF</button></div><div class="preview-doc-wrap">'+docHtml(obj,type)+'</div>';document.querySelectorAll('.page').forEach(p=>p.classList.remove('active','printing'));document.getElementById('printPage').classList.add('active');window.scrollTo(0,0)}
+function printDoc(type){let obj=type==='quote'?qEdit:iEdit;if(!obj)return toast('Open a document first');document.getElementById('printContent').innerHTML=docHtml(obj,type);document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('printPage').classList.add('printing');window.print();setTimeout(()=>{document.getElementById('printPage').classList.remove('printing');openPage('billing');setBillingMode(type)},500)}
+function printSaved(type,id){let obj=(type==='quote'?db.quotations:db.invoices).find(x=>x.id===id);if(!obj)return;document.getElementById('printContent').innerHTML=docHtml(obj,type);document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('printPage').classList.add('printing');window.print();setTimeout(()=>{document.getElementById('printPage').classList.remove('printing');openPage('billing');setBillingMode(type)},500)}
+
+function loadSettings(){document.getElementById('setName').value=db.settings.name||'';document.getElementById('setPhone').value=db.settings.phone||'';document.getElementById('setAddress').value=db.settings.address||'';document.getElementById('setTerms').value=db.settings.terms||'';document.getElementById('logoPreview').src=db.settings.logo||'logo-master.png'}
+function saveSettings(){db.settings.name=document.getElementById('setName').value.trim()||'SZ Billing';db.settings.phone=document.getElementById('setPhone').value.trim();db.settings.address=document.getElementById('setAddress').value.trim();db.settings.terms=document.getElementById('setTerms').value.trim();save();toast('Settings saved')}
+function saveLogo(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{db.settings.logo=r.result;save();document.getElementById('logoPreview').src=r.result;toast('Logo updated')};r.readAsDataURL(f)}
+function resetLogo(){db.settings.logo='logo-master.png';save();loadSettings();toast('SZ logo restored')}
+function backup(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='SZ-Billing-Backup-'+new Date().toISOString().slice(0,10)+'.json';a.click()}
+function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{db=JSON.parse(r.result);save();toast('Backup restored')}catch(x){toast('Invalid backup')}};r.readAsText(f)}
+
+
+/* ================= V30 STABILITY / UX PATCH ================= */
+let __autoSaveTimer=null;
+let __autoSaveBusy=false;
+
+function openFeatureMenu(){
+  document.getElementById('featureDrawer')?.classList.add('show');
+  document.getElementById('menuBackdrop')?.classList.add('show');
+}
+function closeFeatureMenu(){
+  document.getElementById('featureDrawer')?.classList.remove('show');
+  document.getElementById('menuBackdrop')?.classList.remove('show');
+}
+function drawerGo(id){
+  closeFeatureMenu();
+  if(id==='billing'){openBilling();return;}
+  openPage(id);
+}
+
+/* Billing becomes auto-saving after a real customer is selected.
+   Drafts without a customer stay in the editor and are never lost while the
+   page remains open. Existing invoice data format and localStorage key remain unchanged. */
+function autoSaveCurrentInvoice(){
+  if(!iEdit || __autoSaveBusy) return;
+  const cu=db.customers.find(x=>x.id===iEdit.customerId);
+  if(!cu) return;
+  clearTimeout(__autoSaveTimer);
+  __autoSaveTimer=setTimeout(()=>{
+    try{
+      __autoSaveBusy=true;
+      const c=calc(iEdit);
+      const obj={...iEdit,total:c.total,paid:Number(iEdit.paid||0),
+        pending:Math.max(0,c.total-Number(iEdit.paid||0)),
+        customer:cu.name,date:iEdit.date||new Date().toISOString().slice(0,10)};
+      if(obj.id){
+        db.invoices=db.invoices.map(x=>x.id===obj.id?obj:x);
+      }else{
+        obj.id=crypto.randomUUID();
+        db.invoices.push(obj);
+      }
+      iEdit={...obj};
+      localStorage.setItem(KEY,JSON.stringify(db));
+      try{cloudQueueSave()}catch(e){}
+      updateAutosaveNote('✓ Auto-saved');
+      if(document.getElementById('history')?.classList.contains('active')) renderInvoiceHistory();
+    }catch(e){console.error('Auto-save failed',e);updateAutosaveNote('Auto-save retry needed');}
+    finally{__autoSaveBusy=false;}
+  },420);
+}
+function updateAutosaveNote(text){
+  const e=document.getElementById('billingAutosaveNote');if(e)e.textContent=text;
+}
+function installBillingAutosave(){
+  const root=document.getElementById('billingEditor');
+  if(!root || root.__autosaveInstalled)return;
+  root.__autosaveInstalled=true;
+  const handler=()=>{
+    if(iEdit){
+      updateAutosaveNote('Saving…');
+      autoSaveCurrentInvoice();
+    }
+  };
+  root.addEventListener('input',handler);
+  root.addEventListener('change',handler);
+}
+
+/* Patch editor rendering only to show the status line. All existing controls
+   and their handlers remain intact. */
+const __oldRenderBillingEditor=window.renderBillingEditor;
+window.renderBillingEditor=function(){
+  __oldRenderBillingEditor();
+  installBillingAutosave();
+  if(iEdit?.id) updateAutosaveNote('✓ Auto-saved');
+};
+
+/* History must be the single home for saved invoices. It can now reopen the
+   exact invoice in the existing full editor, preserving all edit features. */
+const __oldRenderInvoiceHistory=window.renderInvoiceHistory;
+window.renderInvoiceHistory=function(){
+  if(typeof __oldRenderInvoiceHistory==='function') __oldRenderInvoiceHistory();
+  const el=document.getElementById('invoiceHistoryList');
+  if(!el)return;
+  el.querySelectorAll('.history-row').forEach(row=>{
+    const view=row.querySelector('button[onclick*="viewSaved"]');
+    if(view){
+      const m=view.getAttribute('onclick').match(/viewSaved\('invoice','([^']+)'\)/);
+      if(m){
+        const id=m[1];
+        view.insertAdjacentHTML('beforebegin',
+          `<button class="btn secondary" onclick="openSavedBilling('invoice','${id}')">Edit</button>`);
+      }
+    }
+  });
+};
+
+/* Actionable AI: every recommendation gets a real Apply button.
+   Applying an action updates the same app database, then saves and refreshes
+   the relevant screen. Existing AI analysis/repair remains available. */
+window.aiApplyRecommendation=function(action){
+  db.settings=db.settings||{};
+  try{
+    if(action==='restoreName'){
+      db.settings.name=db.settings.name||'SZ Billing';
+      toast('Business name restored');
+    }else if(action==='docTheme'){
+      db.settings.docTheme='modern';
+      toast('Professional document theme applied');
+    }else if(action==='reminderScan'){
+      if(typeof aiScanAndQueue==='function'){aiScanAndQueue();return;}
+      toast('Reminder scan completed');
+    }else if(action==='repairData'){
+      if(typeof aiAutoRepair==='function'){aiAutoRepair();return;}
+      toast('Data repair completed');
+    }else{
+      toast('No action available for this recommendation');
+      return;
+    }
+    save();
+    if(typeof aiAnalyze==='function')aiAnalyze();
+  }catch(e){console.error(e);toast('Could not apply recommendation');}
+};
+
+window.aiAnalyze=function(){
+  const el=document.getElementById('aiResult');if(!el)return;
+  const invoices=db.invoices||[], customers=db.customers||[], products=db.products||[];
+  const issues=[], rec=[];
+  const seen=new Set();
+  invoices.forEach(i=>{
+    if(!i.id||seen.has(i.id))issues.push('Duplicate or missing invoice ID');
+    seen.add(i.id);
+    const t=calc(i).total;
+    if(Number(i.paid||0)>t)issues.push(`Invoice ${i.no||''}: received exceeds total`);
+    if(Math.max(0,t-Number(i.paid||0))>0&&!i.customerId)issues.push(`Invoice ${i.no||''}: customer is missing`);
+  });
+  customers.forEach(c=>{if(!c.name?.trim())issues.push('A customer has no name')});
+  products.forEach(p=>{if(Number(p.rate)<0)issues.push(`Product ${p.name||''}: negative rate`)});
+  if(!db.settings.name)rec.push({action:'restoreName',text:'Restore the business name to SZ Billing'});
+  if(!db.settings.docTheme)rec.push({action:'docTheme',text:'Set a professional document theme'});
+  const overdue=invoices.filter(i=>Math.max(0,calc(i).total-Number(i.paid||0))>0);
+  const old=overdue.filter(i=>{const d=new Date(i.date||Date.now());return Math.floor((Date.now()-d.getTime())/86400000)>=Number(db.settings.reminderDays||3)});
+  if(old.length)rec.push({action:'reminderScan',text:`Scan ${old.length} pending invoice(s) and add eligible reminders to the queue`});
+  el.innerHTML=`<div class="ai-grid">
+    <div><b>Health</b><div class="ai-score">${issues.length?'Needs attention':'Excellent'}</div><div class="muted small">${issues.length} issue(s) found</div></div>
+    <div><b>Recommendations</b><div class="ai-score">${rec.length}</div><div class="muted small">actions available</div></div>
+    <div><b>Pending</b><div class="ai-score">${old.length}</div><div class="muted small">reminder candidates</div></div>
+  </div>
+  ${issues.length?`<div class="card" style="margin-top:12px"><b>Checks</b>${[...new Set(issues)].map(x=>`<div class="item"><span>⚠️ ${esc(x)}</span></div>`).join('')}</div>`:`<div class="success-card">✓ No critical data consistency issues found.</div>`}
+  ${rec.length?`<div class="card" style="margin-top:12px"><b>AI Recommendations</b>${rec.map(r=>`<div class="item ai-reco"><div class="item-copy"><span>💡 ${esc(r.text)}</span></div><button class="btn accent" onclick="aiApplyRecommendation('${r.action}')">Apply</button></div>`).join('')}`:`<div class="card" style="margin-top:12px"><b>AI Recommendations</b><div class="empty">No new recommendations. Your current setup looks good.</div></div>`}`;
+  if(typeof renderReminderQueue==='function')renderReminderQueue();
+};
+
+/* When history opens, show Edit directly. When billing opens, never render the
+   old duplicate invoice list. */
+const __oldOpenBilling=window.openBilling;
+window.openBilling=function(){
+  __oldOpenBilling();
+  const list=document.getElementById('billingList');if(list)list.style.display='none';
+  setTimeout(()=>{installBillingAutosave();if(iEdit?.id)updateAutosaveNote('✓ Auto-saved');},0);
+};
+const __oldOpenSavedBilling=window.openSavedBilling;
+window.openSavedBilling=function(type,id){
+  __oldOpenSavedBilling(type,id);
+  setTimeout(()=>updateAutosaveNote('✓ Auto-saved'),0);
+};
+
+/* Add status text to the existing editor without replacing its functionality. */
+const __oldRB=window.renderBilling;
+window.renderBilling=function(){
+  __oldRB();
+  const e=document.getElementById('billingEditor');
+  if(e){
+    const card=e.querySelector('.card');
+    if(card && !document.getElementById('billingAutosaveNote') && iEdit){
+      const actions=card.querySelector('.actions');
+      if(actions){
+        const n=document.createElement('span');n.id='billingAutosaveNote';n.className='autosave-note';
+        n.textContent=iEdit.id?'✓ Auto-saved':'Auto-save starts after customer is selected';
+        actions.prepend(n);
+      }
+    }
+  }
+  installBillingAutosave();
+};
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').then(reg=>{reg.update();}).catch(()=>{}));
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!window.__swReloaded){window.__swReloaded=true;window.location.reload();}});
+}
+load();
+</script>
+
+
+<script id="sz-v35-consolidated">
+(function(){
+'use strict';
+/* SZ Billing V35 — consolidated mobile/desktop UX, navigation, billing and AI */
+const css=`
+/* V35 app-like responsive shell */
+:root{--v35-gap:10px}
+body{overflow-x:hidden}
+#billing{max-width:780px!important;margin:0 auto!important}
+#billing .page-head{position:sticky;top:0;z-index:20;padding:9px 0;background:rgba(248,250,252,.94);backdrop-filter:blur(12px);margin-bottom:8px}
+.billing-v35{width:100%;display:block}
+.billing-v35-card{background:#fff;border:1px solid #e6eaf0;border-radius:18px;box-shadow:0 6px 22px rgba(16,24,40,.055);overflow:hidden;margin-bottom:9px}
+.billing-v35-head{padding:14px 15px;background:linear-gradient(135deg,#0b2552,#165dff);color:#fff}
+.billing-v35-head h2{margin:3px 0;font-size:20px}.billing-v35-head p{margin:0;font-size:11px;opacity:.8}
+.billing-v35-body{padding:10px}
+.v35-section{padding:10px;border:1px solid #edf0f4;border-radius:15px;background:#fbfcfe;margin-bottom:8px}
+.v35-section:last-child{margin-bottom:0}.v35-section h3{font-size:13px;margin:0 0 8px;font-weight:900}
+.v35-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v35-grid.three{grid-template-columns:repeat(3,1fr)}
+.v35-grid>div{min-width:0}.v35-section input,.v35-section select,.v35-section textarea{min-height:40px!important;border-radius:11px!important;padding:8px 10px!important;font-size:13px}.v35-section textarea{min-height:54px!important}
+.v35-items{background:#fff;border:1px solid #e4e8ee;border-radius:13px;overflow:hidden}.v35-item{display:grid;grid-template-columns:1fr auto;gap:8px;padding:9px 10px;border-bottom:1px solid #edf0f3}.v35-item:last-child{border-bottom:0}.v35-item b{font-size:13px}.v35-meta{font-size:10px;color:#667085;margin-top:2px}.v35-item-actions{display:flex;gap:5px;align-items:center}.v35-item-actions .btn{padding:6px 8px!important;font-size:11px!important;min-height:30px!important}
+.v35-add{width:100%;min-height:42px;border:1px dashed #91b5f4;background:#f4f8ff;color:#155eef;border-radius:12px;margin-top:7px;font-weight:900}
+.v35-totals{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.v35-total{background:#fff;border:1px solid #e6eaf0;border-radius:12px;padding:8px}.v35-total small{display:block;color:#667085;font-size:9px;font-weight:800}.v35-total b{font-size:13px}.v35-total.grand{background:#eef4ff;border-color:#cfe0ff}.v35-total.pending{background:#fff7ed;border-color:#fed7aa}
+.v35-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.v35-actions .btn{width:100%;min-height:40px!important;padding:8px!important;border-radius:11px!important;font-size:12px!important}
+.v35-sticky{position:sticky;bottom:0;z-index:30;background:rgba(248,250,252,.95);backdrop-filter:blur(12px);padding:7px 0;border-top:1px solid #e5e7eb}
+.v35-note{text-align:center;font-size:10px;color:#667085;padding:5px}
+/* A4 theme cards */
+.design-option{cursor:pointer;transition:.18s transform,.18s box-shadow}.design-option:active{transform:scale(.98)}
+.design-thumb{height:120px!important;background:#e9edf3!important;position:relative!important;overflow:hidden!important}.design-thumb:before{content:"";position:absolute;width:67px;height:94px;left:50%;top:13px;transform:translateX(-50%);background:#fff;border:1px solid #d7dde7;box-shadow:0 6px 14px rgba(15,23,42,.15);border-radius:2px}.design-thumb:after{content:"A4";position:absolute;left:50%;top:53px;transform:translateX(-50%);font-weight:950;font-size:12px;color:#165dff}.design-option.active{outline:2px solid #155eef;box-shadow:0 0 0 3px rgba(21,94,239,.1)}
+.theme-preview-sheet{background:#dfe5ed!important;border-radius:16px!important;padding:12px!important;overflow:auto!important;display:flex!important;justify-content:center!important}.a4-stage{background:transparent!important;padding:0!important;display:flex!important;justify-content:center!important}.doc.a4-paper{width:210mm!important;min-height:297mm!important;max-width:none!important;background:#fff!important;box-shadow:0 15px 38px rgba(15,23,42,.22)!important;flex:none!important}
+/* mobile item picker */
+.sz-item-picker{max-height:82vh;display:flex;flex-direction:column}.sz-item-search{min-height:45px!important;border-radius:13px!important;margin:8px 0!important}.sz-item-list{overflow:auto;display:flex;flex-direction:column;gap:7px}.sz-pick{display:flex;width:100%;align-items:center;justify-content:space-between;text-align:left;padding:12px;border:1px solid #e1e6ed;border-radius:14px;background:#fff}.sz-pick small{display:block;color:#667085;font-size:11px;margin-top:2px}.sz-pick:active{transform:scale(.99)}
+/* app-like pages on desktop and phone: no desktop billing canvas */
+@media(min-width:781px){#billing{max-width:820px!important}.v35-section{padding:9px}.billing-v35-body{padding:10px}.billing-v35-card{border-radius:20px}}
+@media(max-width:600px){#billing{max-width:100%!important}.v35-grid,.v35-grid.three{grid-template-columns:1fr 1fr}.v35-grid .full{grid-column:1/-1}.v35-totals{grid-template-columns:1fr 1fr}.v35-total.grand{grid-column:1/-1}.v35-actions{grid-template-columns:1fr 1fr}.v35-actions .wide{grid-column:1/-1}.billing-v35-head{padding:12px}.billing-v35-body{padding:7px}.v35-section{padding:8px}}
+`;
+const st=document.createElement('style');st.id='sz-v35-style';st.textContent=css;document.head.appendChild(st);
+function E(s){return typeof esc==='function'?esc(s):String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function ensure(){db.settings=db.settings||{};db.settings.docTheme=db.settings.docTheme||'modern';db.settings.pendingPostTheme=db.settings.pendingPostTheme||'professional';db.settings.reminderDays=Math.max(1,Number(db.settings.reminderDays||3));}
+function label(t){return ({modern:'Modern Blue',classic:'Classic Light',emerald:'Emerald Pro',midnight:'Midnight'}[t]||t)}
+window.previewDocTheme=function(t){ensure();const obj={id:'preview',no:'INV-0001',date:new Date().toISOString().slice(0,10),due:new Date().toISOString().slice(0,10),customerId:'',customer:'Sample Customer',paid:2500,discount:100,terms:'Thank you for your business.',items:[{name:'CCTV Camera 2MP',unit:'PCS',qty:2,rate:2500},{name:'Installation Service',unit:'JOB',qty:1,rate:1500}]};const html=docHtml(obj,'invoice',t);openModal(`<div class="actions" style="justify-content:space-between;margin-top:0"><div><div class="eyebrow">A4 THEME PREVIEW</div><h2 style="margin:2px 0">${E(label(t))}</h2></div><button class="x" onclick="closeModal()">×</button></div><div class="theme-preview-sheet"><div class="a4-stage">${html}</div></div><div class="actions"><button class="btn" onclick="setDocTheme('${t}');closeModal()">✓ Use This Theme</button><button class="btn secondary" onclick="closeModal()">Close</button></div>`)};
+function wireThemes(){document.querySelectorAll('[data-doc-theme]').forEach(b=>{b.onclick=()=>previewDocTheme(b.dataset.docTheme)});document.querySelectorAll('[data-post-theme]').forEach(b=>{b.onclick=()=>{setPendingPostTheme(b.dataset.postTheme)}})}
+const oldLoadSettings=window.loadSettings;window.loadSettings=function(){try{oldLoadSettings&&oldLoadSettings()}catch(e){}ensure();document.querySelectorAll('[data-doc-theme]').forEach(x=>x.classList.toggle('active',x.dataset.docTheme===db.settings.docTheme));document.querySelectorAll('[data-post-theme]').forEach(x=>x.classList.toggle('active',x.dataset.postTheme===db.settings.pendingPostTheme));wireThemes()};
+window.setDocTheme=function(t){ensure();db.settings.docTheme=t;save();loadSettings();toast('PDF theme set: '+label(t))};
+window.setPendingPostTheme=function(t){ensure();db.settings.pendingPostTheme=t;save();loadSettings();toast('Pending post design set: '+t)};
+/* Compact single-column billing workspace */
+window.renderBilling=function(){const e=document.getElementById('billingEditor');if(!e)return;ensure();const o=iEdit;if(!o){e.innerHTML='<div class="billing-v35-card"><div class="billing-v35-body"><div class="empty">Tap <b>New Invoice</b> to start.</div></div></div>';return}const c=calc(o),pending=Math.max(0,c.total-Number(o.paid||0));const items=o.items||[];e.innerHTML=`<div class="billing-v35">
+<div class="billing-v35-card"><div class="billing-v35-head"><div class="eyebrow">SMART BILLING</div><h2>Invoice ${E(o.no)}</h2><p>Mobile app style • works the same on phone and PC</p></div><div class="billing-v35-body">
+<div class="v35-section"><h3>👤 Customer & Dates</h3><div class="v35-grid"><div class="full"><label>Customer</label><select onchange="iEdit.customerId=this.value;autoSaveCurrentInvoice()">${customerOptions(o.customerId)}</select></div><div><label>Invoice Date</label><input type="date" value="${E(o.date)}" onchange="iEdit.date=this.value;autoSaveCurrentInvoice()"></div><div><label>Due Date</label><input type="date" value="${E(o.due||'')}" onchange="iEdit.due=this.value;autoSaveCurrentInvoice()"></div></div></div>
+<div class="v35-section"><h3>📦 Items & Services <span class="muted small">${items.length} item(s)</span></h3><div class="v35-items">${items.length?items.map((it,n)=>`<div class="v35-item"><div><b>${E(it.name||'Item')}</b><div class="v35-meta">${E(it.unit||'PCS')} • Qty ${Number(it.qty||0)} × ${money(it.rate)} = ${money(Number(it.qty||0)*Number(it.rate||0))}</div></div><div class="v35-item-actions"><button class="btn secondary" onclick="editDocItem('i',${n})">Edit</button><button class="btn danger" onclick="iRemove(${n})">×</button></div></div>`).join(''):'<div class="empty" style="padding:12px">No item added yet.</div>'}</div><button class="v35-add" onclick="addDocItem('invoice')">＋ Add Item / Service</button></div>
+<div class="v35-section"><h3>💰 Payment & Pricing</h3><div class="v35-grid three"><div><label>Discount</label><input id="billDiscount" type="number" inputmode="decimal" value="${Number(o.discount||0)}" oninput="iEdit.discount=Number(this.value)||0;updateBillingTotals();autoSaveCurrentInvoice()"></div><div><label>Received / Paid</label><input id="billPaid" type="number" inputmode="decimal" value="${Number(o.paid||0)}" oninput="iEdit.paid=Number(this.value)||0;updateBillingTotals();autoSaveCurrentInvoice()"></div><div><label>Share As</label><select onchange="iEdit.shareAs=this.value;autoSaveCurrentInvoice()"><option value="invoice" ${o.shareAs!=='quotation'?'selected':''}>Invoice</option><option value="quotation" ${o.shareAs==='quotation'?'selected':''}>Quotation</option></select></div></div></div>
+<div class="v35-totals"><div class="v35-total"><small>SUBTOTAL</small><b id="billSubtotal">${money(c.sub)}</b></div><div class="v35-total"><small>DISCOUNT</small><b id="billDisc">${money(c.disc)}</b></div><div class="v35-total grand"><small>TOTAL</small><b id="billTotal">${money(c.total)}</b></div><div class="v35-total pending"><small>PENDING</small><b id="billPending">${money(pending)}</b></div></div>
+<div class="v35-section"><h3>📝 Terms</h3><textarea oninput="iEdit.terms=this.value;autoSaveCurrentInvoice()">${E(o.terms||'')}</textarea></div>
+<div class="v35-sticky"><div class="v35-actions"><button class="btn" onclick="saveBilling()">Save Invoice</button><button class="btn ok" onclick="markFullPaidAndSave()">✓ Full Paid</button><button class="btn accent" onclick="printDoc('invoice')">Print / PDF</button><button class="btn secondary" onclick="viewCurrentBilling()">Preview</button><button class="btn ok" onclick="invoiceWA()">WhatsApp</button><button class="btn secondary" onclick="pendingPost()">Pending Post</button></div><div id="billingAutosaveNote" class="v35-note">✓ Auto-save enabled</div></div>
+</div></div></div>`;updateBillingTotals()};
+window.updateBillingTotals=(function(orig){return function(){try{orig&&orig()}catch(e){}const s=document.getElementById('billSubtotal'),d=document.getElementById('billDisc'),t=document.getElementById('billTotal'),p=document.getElementById('billPending');if(iEdit){const c=calc(iEdit),pending=Math.max(0,c.total-Number(iEdit.paid||0));if(s)s.textContent=money(c.sub);if(d)d.textContent=money(c.disc);if(t)t.textContent=money(c.total);if(p)p.textContent=money(pending)}}})(window.updateBillingTotals);
+/* Reliable saved item picker. No custom item/service button. */
+window.showSavedItemPicker=function(type){const ps=(db.products||[]).slice();const rows=ps.length?ps.map(p=>`<button class="sz-pick" onclick="selectSavedItem('${type}','${E(p.id)}')"><span><b>${E(p.name||'Unnamed item')}</b><small>${E(p.unit||'PCS')} • ${money(p.rate||0)}</small></span><strong>＋</strong></button>`).join(''):'<div class="empty">No saved products/services found. Add them from Products first.</div>';openModal(`<div class="sz-item-picker"><div class="actions" style="justify-content:space-between;margin-top:0"><div><div class="eyebrow">ADD TO BILL</div><h2 style="margin:2px 0">Select Item / Service</h2></div><button class="x" onclick="closeModal()">×</button></div><input id="szItemSearch" class="sz-item-search" placeholder="Search item or service…" oninput="filterSzItems(this.value)"><div id="szItemList" class="sz-item-list">${rows}</div><div class="actions"><button class="btn secondary" onclick="closeModal()">Cancel</button></div></div>`);setTimeout(()=>document.getElementById('szItemSearch')?.focus(),80)};
+window.filterSzItems=function(q){q=(q||'').toLowerCase();document.querySelectorAll('#szItemList .sz-pick').forEach(x=>x.style.display=(x.innerText||'').toLowerCase().includes(q)?'flex':'none')};
+window.selectSavedItem=function(type,id){const o=type==='quote'?qEdit:iEdit,p=(db.products||[]).find(x=>String(x.id)===String(id));if(!o||!p)return toast('Item not found');o.items=o.items||[];o.items.push({id:crypto.randomUUID(),productId:p.id,name:p.name,unit:p.unit||'PCS',qty:1,rate:Number(p.rate)||0});closeModal();if(type==='quote')renderQuoteEditor();else renderBilling();if(type==='invoice')autoSaveCurrentInvoice()};
+/* Remove custom item action from any legacy picker if present */
+const oldAdd=window.addDocItem;window.addDocItem=function(type){return showSavedItemPicker(type)};
+/* Theme document generator wrapper: force selected theme and A4 class */
+const baseDoc=window.docHtml;window.docHtml=function(obj,type,themeOverride){ensure();const t=themeOverride||db.settings.docTheme||'modern';if(typeof baseDoc==='function'){let h=baseDoc(obj,type);h=h.replace(/doc-theme-[\w-]+/,'doc-theme-'+E(t));if(!/a4-paper/.test(h))h=h.replace('class="doc ','class="doc a4-paper ');return h}return ''};
+/* Advanced actionable local AI */
+function aiState(){ensure();const invoices=db.invoices||[],customers=db.customers||[],products=db.products||[];const issues=[],recs=[];const seen={};invoices.forEach(i=>{if(i.id)seen[i.id]=(seen[i.id]||0)+1;if(!i.id)issues.push('Invoice has missing ID: '+(i.no||'Unknown'));const c=calc(i),paid=Number(i.paid||0);if(paid>c.total+.01)issues.push('Paid amount exceeds total: '+(i.no||''));if(!Array.isArray(i.items)||!i.items.length)issues.push('Invoice has no items: '+(i.no||''));if(c.total>0&&paid<c.total&&!i.customerId&&i.status!=='draft')issues.push('Pending invoice has no customer: '+(i.no||''));});Object.keys(seen).forEach(k=>{if(seen[k]>1)issues.push('Duplicate invoice ID: '+k)});customers.forEach(c=>{if(!String(c.name||'').trim())issues.push('Customer without a name')});products.forEach(p=>{if(Number(p.rate)<0)issues.push('Negative product rate: '+(p.name||'item'))});if(!db.settings.name||db.settings.name==='SZ Billing')recs.push({a:'profile',t:'Complete your business profile before sending invoices.'});if(!db.settings.docTheme)recs.push({a:'theme',t:'Choose a professional A4 PDF theme.'});const pending=invoices.filter(i=>Math.max(0,calc(i).total-Number(i.paid||0))>0);if(pending.length)recs.push({a:'pending',t:`Review ${pending.length} pending invoice(s) and prepare payment reminders.`});if(issues.length)recs.push({a:'repair',t:'Run safe data repair to normalize invoice totals and missing fields.'});recs.push({a:'design',t:'Optimize the app and invoice design for a clean professional workflow.'});return {issues:[...new Set(issues)],recs,pending}};
+window.aiApplyRecommendation=function(a){try{ensure();if(a==='theme'){db.settings.docTheme='modern';save();loadSettings();toast('A4 PDF theme applied');return}if(a==='design'){db.settings.theme='blue';db.settings.docTheme=db.settings.docTheme||'modern';save();applyTheme();loadSettings();toast('Professional design optimized');return}if(a==='profile'){openPage('settings');toast('Business profile opened');return}if(a==='pending'){if(typeof aiScanAndQueue==='function'){aiScanAndQueue()}else toast('Pending invoices reviewed');return}if(a==='repair'){(db.invoices||[]).forEach(i=>{if(!i.id)i.id=crypto.randomUUID();if(!Array.isArray(i.items))i.items=[];i.items=i.items.map(x=>({...x,qty:Number(x.qty)||0,rate:Number(x.rate)||0,unit:x.unit||'PCS'}));const c=calc(i);i.total=c.total;i.paid=Math.min(Math.max(0,Number(i.paid)||0),c.total);i.pending=Math.max(0,c.total-i.paid)});save();toast('Safe repair applied');return}}catch(e){console.error(e);toast('AI action failed safely')}};
+window.aiApplyAllSafe=function(){const r=aiState();[...new Set(r.recs.map(x=>x.a))].forEach(a=>{if(a!=='profile')aiApplyRecommendation(a)});toast('AI safe recommendations implemented')};
+window.aiRunCommand=function(){const q=(document.getElementById('aiCommand')?.value||'').toLowerCase().trim();if(!q)return toast('Type a command');if(/fix|repair|bug|correct/.test(q)){aiApplyRecommendation('repair');renderAI?.();return}if(/theme|pdf|invoice design/.test(q)){aiApplyRecommendation('theme');return}if(/design|professional|modern|ui|look/.test(q)){aiApplyRecommendation('design');return}if(/pending|overdue|reminder/.test(q)){aiApplyRecommendation('pending');return}if(/customer|client/.test(q)&&/add|new|create/.test(q)){openPage('customers');openCustomer();return}if(/product|item/.test(q)&&/add|new|create/.test(q)){openPage('products');openProduct();return}if(/invoice|bill/.test(q)&&/new|create|make/.test(q)){newBilling('invoice');return}if(/settings/.test(q)){openPage('settings');return}if(/all|everything|advance|optimize/.test(q)){aiApplyAllSafe();return}renderAI?.();toast('Copilot analyzed your request')};
+/* Keep autosave but make it robust and non-blocking */
+window.autoSaveCurrentInvoice=function(){if(!iEdit)return;clearTimeout(window.__v35auto);window.__v35auto=setTimeout(()=>{try{const c=calc(iEdit),obj={...iEdit,total:c.total,paid:Number(iEdit.paid||0),pending:Math.max(0,c.total-Number(iEdit.paid||0)),customer:(db.customers.find(x=>x.id===iEdit.customerId)?.name||iEdit.customer||'Draft'),status:iEdit.customerId?'saved':'draft',date:iEdit.date||new Date().toISOString().slice(0,10)};if(obj.id)db.invoices=db.invoices.map(x=>x.id===obj.id?obj:x);else{obj.id=crypto.randomUUID();db.invoices.push(obj)}iEdit={...obj};localStorage.setItem(KEY,JSON.stringify(db));try{cloudQueueSave()}catch(e){}const n=document.getElementById('billingAutosaveNote');if(n)n.textContent='✓ Auto-saved';}catch(e){console.error(e)}},250)};
+/* Ensure legacy custom button is hidden if old DOM gets rendered */
+function removeCustom(){document.querySelectorAll('button').forEach(b=>{if(/custom item|custom item \/ service/i.test(b.textContent||'')){b.remove()}})}
+const obs=new MutationObserver(()=>removeCustom());obs.observe(document.body,{childList:true,subtree:true});
+document.addEventListener('DOMContentLoaded',()=>{ensure();wireThemes();setTimeout(()=>{try{loadSettings()}catch(e){};removeCustom()},250)});
+})();
+
+</script>
+<style id="sz-v36-final-style">
+html,body{width:100%;min-width:0;overflow-x:hidden}body{font-size:15px}.app{width:100%;max-width:none!important;margin:0!important}.top{width:100%;position:sticky;top:0}.app main,main{width:100%;max-width:1050px;margin:0 auto;padding-left:14px;padding-right:14px}.page{width:100%;max-width:none;min-width:0}.page.active{width:100%}#billing{width:100%!important;max-width:760px!important;margin:0 auto!important}.billing-v35,.billing-v35-card,.billing-v35-body{width:100%!important;max-width:none!important;min-width:0}.billing-v35-card{overflow:hidden}.v35-grid,.v35-grid.three,.v35-totals,.v35-actions{min-width:0}.v35-section input,.v35-section select,.v35-section textarea{max-width:100%;box-sizing:border-box}.v35-actions{position:sticky;bottom:0}.v35-sticky{position:sticky;bottom:0}
+@media(max-width:760px){main{padding:10px 10px 20px!important}.page{padding:10px 0!important}.title{font-size:24px!important}.billing-v35-card{border-radius:16px!important;margin-bottom:7px}.billing-v35-head{padding:13px!important}.billing-v35-body{padding:7px!important}.v35-section{padding:8px!important;margin-bottom:7px!important}.v35-grid,.v35-grid.three{grid-template-columns:1fr 1fr!important}.v35-grid .full{grid-column:1/-1}.v35-totals{grid-template-columns:1fr 1fr!important}.v35-total.grand{grid-column:1/-1}.v35-actions{grid-template-columns:1fr 1fr!important}.v35-actions .btn{min-height:42px!important}.v35-add{min-height:44px!important}}
+@media(min-width:761px){#billing{max-width:760px!important}}
+/* Never render patch/source text as page content. */
+</style>
+
+<style id="sz-v37-targeted">
+/* V37 targeted UI only */
+.v37-preview-modal{width:100%;max-width:980px;margin:auto}.v37-preview-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.v37-preview-head h2{margin:2px 0 4px}.v37-a4-stage{background:#dfe5ed;border-radius:18px;padding:14px;display:flex;justify-content:center;overflow:auto;max-height:72vh;margin-top:12px}.v37-a4-demo{width:794px;min-height:1123px;background:#fff;box-shadow:0 15px 40px rgba(15,23,42,.22);padding:44px;box-sizing:border-box;color:#172033;flex:none}.v37-a4-head{display:flex;justify-content:space-between;align-items:center;border-bottom:4px solid var(--h);padding-bottom:22px}.v37-a4-head>div{display:flex;gap:12px;align-items:center}.v37-logo-box{width:52px;height:52px;border-radius:12px;background:var(--s);color:var(--h);display:grid;place-items:center;font-weight:950}.v37-a4-head b{font-size:18px;display:block}.v37-a4-head span{display:block;font-size:10px;color:#667085;margin-top:3px}.v37-a4-head>strong{font-size:27px;color:var(--h);letter-spacing:1px}.v37-a4-meta{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:34px 0}.v37-a4-meta>div{padding:18px;background:var(--s);border:1px solid var(--l);border-radius:12px}.v37-a4-meta small,.v37-a4-bottom small{display:block;font-size:9px;font-weight:900;color:#667085;letter-spacing:1px;margin-bottom:7px}.v37-a4-meta b{display:block;font-size:15px}.v37-a4-meta span{display:block;font-size:10px;color:#667085;margin-top:4px}.v37-a4-table{border:1px solid var(--l);border-radius:12px;overflow:hidden}.v37-a4-table>div{display:grid;grid-template-columns:45px 1fr 60px 100px 110px;gap:8px;padding:13px;border-bottom:1px solid #e5e7eb;font-size:10px;align-items:center}.v37-a4-table .th{background:var(--h);color:#fff;font-weight:900}.v37-a4-table>div:last-child{border-bottom:0}.v37-a4-table small{display:block;color:#667085;font-size:8px;margin-top:2px}.v37-a4-bottom{display:grid;grid-template-columns:1fr 270px;gap:30px;margin-top:35px}.v37-a4-bottom p{font-size:10px;line-height:1.7;color:#667085}.v37-a4-total>div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e5e7eb;font-size:11px}.v37-a4-total .grand{font-size:15px;font-weight:900;color:var(--h);border-top:2px solid var(--h);margin-top:5px;padding-top:11px}.v37-post-stage{background:#dfe5ed;border-radius:18px;padding:12px;display:flex;justify-content:center;overflow:auto;max-height:72vh;margin-top:12px}.v37-post-demo{width:600px;aspect-ratio:4/5;background:linear-gradient(160deg,#f7faff,#fff);box-shadow:0 15px 40px rgba(15,23,42,.22);flex:none;color:#334155;position:relative;overflow:hidden;padding:38px;box-sizing:border-box}.v37-post-demo .post-top{height:24%;background:var(--a);color:#fff;margin:-38px -38px 24px;padding:38px}.v37-post-demo .post-top b{font-size:11px;letter-spacing:1px}.v37-post-demo .post-top span{float:right;font-size:9px;opacity:.7}.v37-post-demo h1{font-size:30px;margin:34px 0 7px}.v37-post-demo .post-top p{font-size:10px;opacity:.75}.v37-post-demo .post-customer,.v37-post-demo .post-balance{border:1px solid var(--l);background:#fff;border-radius:13px;padding:18px;margin-bottom:13px}.v37-post-demo small{display:block;font-size:8px;font-weight:900;letter-spacing:.8px;color:#718096}.v37-post-demo .post-customer strong{display:block;font-size:18px;color:var(--a);margin:6px 0}.v37-post-demo .post-customer span{font-size:9px;color:#718096}.v37-post-demo .post-balance{background:var(--s);display:grid;grid-template-columns:1fr 1px 130px;gap:15px;align-items:center}.v37-post-demo .post-balance>b{display:block;font-size:28px;color:var(--a);margin:8px 0}.v37-post-demo .post-balance>span{font-size:9px;color:#718096}.v37-post-demo .post-balance hr{height:80px;border:0;border-left:1px solid var(--l);margin:0}.v37-post-demo .post-balance>div small{margin:4px 0}.v37-post-demo .post-balance>div b{display:block;color:var(--a);font-size:13px;margin-bottom:8px}.v37-post-demo .post-copy{font-size:9px;line-height:1.6;margin:18px 4px}.v37-post-demo .post-copy>b{font-size:12px;color:var(--a)}.v37-post-demo .post-footer{position:absolute;left:38px;right:38px;bottom:38px;background:var(--a);color:#fff;border-radius:13px;padding:18px}.v37-post-demo .post-footer b{display:block;font-size:15px}.v37-post-demo .post-footer span{display:block;font-size:8px;opacity:.75;margin-top:4px}.ai-reco{align-items:center}.ai-reco .item-copy{flex:1}.ai-reco .item-copy small{display:block;margin-top:4px}
+@media(max-width:600px){.v37-a4-stage{padding:8px;max-height:66vh}.v37-a4-demo{transform-origin:top center;zoom:.46;margin-bottom:-600px}.v37-post-stage{padding:8px;max-height:66vh}.v37-post-demo{zoom:.46;margin-bottom:-450px}.v37-a4-bottom{grid-template-columns:1fr}.v37-a4-meta{grid-template-columns:1fr}.v37-a4-table>div{grid-template-columns:25px 1fr 35px 65px 70px;font-size:8px}.v37-a4-demo{padding:28px}.v37-post-demo{padding:28px}.v37-post-demo .post-top{margin:-28px -28px 18px;padding:28px}.v37-post-demo .post-footer{left:28px;right:28px;bottom:28px}}
+</style>
+
+<script id="sz-v37-patch">
+/* SZ Billing V37 — targeted fixes only: history delete, visual theme previews,
+   advanced actionable AI, and reliable in-app back navigation. */
+(function(){
+'use strict';
+
+function S(v){return typeof esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function ensureV37(){db.settings=db.settings||{};db.settings.docTheme=db.settings.docTheme||'modern';db.settings.pendingPostTheme=db.settings.pendingPostTheme||'professional';}
+
+/* ---------- Invoice History: delete ---------- */
+window.deleteHistoryInvoice=function(id){
+  const inv=(db.invoices||[]).find(x=>String(x.id)===String(id));
+  if(!inv)return toast('Invoice not found');
+  if(!confirm('Delete invoice '+(inv.no||'')+' from Billing History? This cannot be undone.'))return;
+  db.invoices=db.invoices.filter(x=>String(x.id)!==String(id));
+  if(window.iEdit && String(iEdit.id)===String(id)) iEdit=null;
+  save();
+  try{renderDashboard()}catch(e){}
+  try{renderInvoiceHistory()}catch(e){}
+  toast('Invoice deleted from history');
+};
+
+const oldHistory=window.renderInvoiceHistory;
+window.renderInvoiceHistory=function(){
+  const el=document.getElementById('invoiceHistoryList');
+  if(!el){if(typeof oldHistory==='function')oldHistory();return;}
+  const q=(document.getElementById('historySearch')?.value||'').toLowerCase();
+  const f=document.getElementById('historyFilter')?.value||'all';
+  const a=(db.invoices||[]).slice().reverse().filter(i=>{
+    const p=Number(i.pending||0)>0;
+    return (f==='all'||(f==='pending'?p:!p)) && (!q||`${i.no} ${i.customer} ${i.date}`.toLowerCase().includes(q));
+  });
+  el.innerHTML=a.length?a.map(i=>`<div class="history-row">
+    <div><div class="history-no">${S(i.no||'Invoice')}</div><div class="muted small">${S(i.customer||'Walk-in')} • ${S(i.date||'')}</div></div>
+    <div class="history-money">${money(i.total||0)}<div class="small ${Number(i.pending||0)>0?'pending-text':'paid-text'}">${Number(i.pending||0)>0?money(i.pending)+' pending':'Paid'}</div></div>
+    <div class="actions">
+      <button class="btn" onclick="openSavedBilling('invoice','${S(i.id)}')">Edit</button>
+      <button class="btn secondary" onclick="viewSaved('invoice','${S(i.id)}')">View</button>
+      <button class="btn accent" onclick="printSaved('invoice','${S(i.id)}')">PDF</button>
+      ${Number(i.pending||0)>0?`<button class="btn ok" onclick="markSavedInvoicePaid('${S(i.id)}')">Full Paid</button>`:''}
+      <button class="btn danger" onclick="deleteHistoryInvoice('${S(i.id)}')">Delete</button>
+    </div>
+  </div>`).join(''):'<div class="empty">No invoice history found.</div>';
+};
+
+/* ---------- Visual invoice A4 theme previews ---------- */
+const v37DocLabels={modern:'Modern Blue',classic:'Classic Light',emerald:'Emerald Pro',midnight:'Midnight'};
+function invoicePreviewHtml(t){
+  const theme={
+    modern:{head:'#165dff',soft:'#eef4ff',line:'#cfe0ff'},
+    classic:{head:'#334155',soft:'#f8fafc',line:'#e2e8f0'},
+    emerald:{head:'#166534',soft:'#f0fdf4',line:'#bbf7d0'},
+    midnight:{head:'#111827',soft:'#eef2ff',line:'#c7d2fe'}
+  }[t]||{head:'#165dff',soft:'#eef4ff',line:'#cfe0ff'};
+  return `<div class="v37-a4-demo" style="--h:${theme.head};--s:${theme.soft};--l:${theme.line}">
+    <div class="v37-a4-head"><div><div class="v37-logo-box">SZ</div><div><b>SZ BILLING</b><span>Smart invoicing & business management</span></div></div><strong>INVOICE</strong></div>
+    <div class="v37-a4-meta"><div><small>BILL TO</small><b>Sample Customer</b><span>0300 1234567</span></div><div><small>INVOICE DETAILS</small><b>INV-0001</b><span>Date: 14/09/2026</span><span>Due: 20/09/2026</span></div></div>
+    <div class="v37-a4-table"><div class="th"><span>#</span><span>Item / Service</span><span>Qty</span><span>Rate</span><span>Amount</span></div><div><span>01</span><span><b>CCTV Camera 2MP</b><small>PCS</small></span><span>2</span><span>Rs. 2,500</span><span>Rs. 5,000</span></div><div><span>02</span><span><b>Installation Service</b><small>JOB</small></span><span>1</span><span>Rs. 1,500</span><span>Rs. 1,500</span></div></div>
+    <div class="v37-a4-bottom"><div><small>TERMS & CONDITIONS</small><p>Thank you for your business. Installation/workmanship terms as agreed with customer.</p></div><div class="v37-a4-total"><div>Subtotal <b>Rs. 6,500</b></div><div>Discount <b>Rs. 100</b></div><div class="grand">Total <b>Rs. 6,400</b></div><div>Received <b>Rs. 2,500</b></div><div>Pending <b>Rs. 3,900</b></div></div></div>
+  </div>`;
+}
+window.previewDocTheme=function(t){
+  ensureV37();
+  openModal(`<div class="v37-preview-modal"><div class="v37-preview-head"><div><div class="eyebrow">A4 PAPER PREVIEW</div><h2>${S(v37DocLabels[t]||t)}</h2><small>Actual A4 proportion • this is how the invoice will look when printed/PDF</small></div><button class="x" onclick="closeModal()">×</button></div><div class="v37-a4-stage">${invoicePreviewHtml(t)}</div><div class="actions"><button class="btn" onclick="setDocTheme('${S(t)}');closeModal()">✓ Use This Theme</button><button class="btn secondary" onclick="closeModal()">Close</button></div></div>`);
+};
+
+/* ---------- Pending post: actual 1200×1500 portrait preview ---------- */
+const v37PostLabels={professional:'Professional',minimal:'Minimal',emerald:'Emerald',midnight:'Midnight'};
+function pendingPreviewHtml(t){
+  const p={professional:{a:'#0b1f3a',b:'#165dff',s:'#f3f8ff',l:'#cfe0f4'},minimal:{a:'#334155',b:'#64748b',s:'#f8fafc',l:'#e2e8f0'},emerald:{a:'#14532d',b:'#16a34a',s:'#f0fdf4',l:'#bbf7d0'},midnight:{a:'#111827',b:'#4f46e5',s:'#eef2ff',l:'#c7d2fe'}}[t]||null;
+  return `<div class="v37-post-demo" style="--a:${p.a};--b:${p.b};--s:${p.s};--l:${p.l}"><div class="post-top"><b>SZ BILLING</b><span>PAYMENT NOTICE</span><h1>Payment Reminder</h1><p>A professional courtesy regarding your outstanding balance</p></div><div class="post-customer"><small>ACCOUNT HOLDER</small><strong>Sample Customer</strong><span>Invoice #INV-0001</span></div><div class="post-balance"><small>OUTSTANDING BALANCE</small><b>Rs. 3,900</b><span>Amount currently due</span><hr><div><small>TOTAL BILL</small><b>Rs. 6,400</b><small>RECEIVED</small><b>Rs. 2,500</b></div></div><div class="post-copy"><b>Dear Customer,</b><p>We appreciate your trust and continued business.</p><p>When convenient, please arrange the outstanding payment.</p><p>If payment has already been made, kindly share the confirmation.</p></div><div class="post-footer"><b>SZ BILLING</b><span>For payment confirmation or account assistance</span><span>0300 1234567</span></div></div>`;
+}
+window.previewPendingPostTheme=function(t){
+  ensureV37();
+  openModal(`<div class="v37-preview-modal"><div class="v37-preview-head"><div><div class="eyebrow">PENDING POST PREVIEW</div><h2>${S(v37PostLabels[t]||t)}</h2><small>Actual 1200 × 1500 portrait size • WhatsApp/social post design</small></div><button class="x" onclick="closeModal()">×</button></div><div class="v37-post-stage">${pendingPreviewHtml(t)}</div><div class="actions"><button class="btn" onclick="setPendingPostTheme('${S(t)}');closeModal()">✓ Use This Design</button><button class="btn secondary" onclick="closeModal()">Close</button></div></div>`);
+};
+function wireV37Themes(){
+  document.querySelectorAll('[data-doc-theme]').forEach(b=>{b.onclick=()=>previewDocTheme(b.dataset.docTheme)});
+  document.querySelectorAll('[data-post-theme]').forEach(b=>{b.onclick=()=>previewPendingPostTheme(b.dataset.postTheme)});
+}
+
+/* ---------- Advanced local AI Copilot ---------- */
+function aiV37State(){
+  ensureV37();
+  const inv=db.invoices||[], cus=db.customers||[], pro=db.products||[];
+  const issues=[], rec=[]; const seen=new Set(); let revenue=0,paid=0,pending=0;
+  inv.forEach(i=>{
+    const c=calc(i), t=c.total, p=Math.max(0,Number(i.paid||0)); revenue+=t; paid+=Math.min(p,t); pending+=Math.max(0,t-p);
+    if(!i.id)issues.push('Invoice without ID: '+(i.no||'Unknown'));
+    else if(seen.has(i.id))issues.push('Duplicate invoice ID: '+(i.no||i.id)); else seen.add(i.id);
+    if(!Array.isArray(i.items)||!i.items.length)issues.push('Invoice has no items: '+(i.no||''));
+    if(p>t+.01)issues.push('Received amount exceeds total: '+(i.no||''));
+    if(t>0&&p<t&&!i.customerId&&i.status!=='draft')issues.push('Pending invoice has no customer: '+(i.no||''));
+  });
+  cus.forEach(c=>{if(!String(c.name||'').trim())issues.push('Customer without a name')});
+  pro.forEach(p=>{if(Number(p.rate)<0)issues.push('Negative product rate: '+(p.name||'item'))});
+  if(!db.settings.name||db.settings.name==='SZ Billing')rec.push({a:'profile',t:'Complete your business profile so invoices look branded.',safe:false});
+  if(!db.settings.docTheme)rec.push({a:'theme',t:'Choose an A4 invoice theme before your next PDF.',safe:true});
+  if(inv.length)rec.push({a:'pending',t:`Review ${inv.filter(i=>Math.max(0,calc(i).total-Number(i.paid||0))>0).length} pending invoice(s) and prepare reminders.`,safe:true});
+  if(issues.length)rec.push({a:'repair',t:'Normalize invoice IDs, item values, totals and payment amounts.',safe:true});
+  rec.push({a:'design',t:'Use a consistent professional app/document theme.',safe:true});
+  return {inv,cus,pro,issues:[...new Set(issues)],rec,revenue,paid,pending,avg:inv.length?revenue/inv.length:0};
+}
+window.aiApplyRecommendation=function(a){
+  try{
+    const s=aiV37State();
+    if(a==='profile'){openPage('settings');toast('Business profile opened');return;}
+    if(a==='theme'){db.settings.docTheme=db.settings.docTheme||'modern';save();loadSettings();toast('A4 invoice theme applied');return;}
+    if(a==='design'){db.settings.docTheme=db.settings.docTheme||'modern';db.settings.pendingPostTheme=db.settings.pendingPostTheme||'professional';db.settings.theme=db.settings.theme||'blue';applyTheme();save();loadSettings();toast('Professional design settings applied');return;}
+    if(a==='pending'){if(typeof aiScanAndQueue==='function')aiScanAndQueue();else toast('Pending invoices reviewed');return;}
+    if(a==='repair'){
+      (db.invoices||[]).forEach(i=>{if(!i.id)i.id=crypto.randomUUID();if(!Array.isArray(i.items))i.items=[];i.items=i.items.map(x=>({...x,qty:Math.max(0,Number(x.qty)||0),rate:Math.max(0,Number(x.rate)||0),unit:x.unit||'PCS'}));const c=calc(i);i.total=c.total;i.paid=Math.min(Math.max(0,Number(i.paid)||0),c.total);i.pending=Math.max(0,c.total-i.paid);});
+      save();renderDashboard();renderInvoiceHistory();toast('Safe data repair applied');return;
+    }
+  }catch(e){console.error(e);toast('AI action failed safely')}
+};
+window.aiApplyAllSafe=function(){const s=aiV37State();s.rec.filter(r=>r.safe).forEach(r=>aiApplyRecommendation(r.a));toast('All safe AI recommendations implemented')};
+window.aiRunCommand=function(){
+  const q=(document.getElementById('aiCommand')?.value||'').toLowerCase().trim();if(!q)return toast('Type a command');
+  if(/fix|repair|correct|normalize|clean/.test(q)){aiApplyRecommendation('repair');renderAI?.();return}
+  if(/pending|overdue|reminder|unpaid/.test(q)){aiApplyRecommendation('pending');return}
+  if(/pdf|invoice.*theme|theme/.test(q)){aiApplyRecommendation('theme');return}
+  if(/design|professional|modern|look|ui/.test(q)){aiApplyRecommendation('design');return}
+  if(/customer|client/.test(q)&&/add|new|create/.test(q)){openPage('customers');openCustomer();return}
+  if(/product|item/.test(q)&&/add|new|create/.test(q)){openPage('products');openProduct();return}
+  if(/invoice|bill/.test(q)&&/new|create|make/.test(q)){newBilling('invoice');return}
+  if(/setting/.test(q)){openPage('settings');return}
+  if(/sales|revenue|income|earning/.test(q)){window.aiAnalyze();toast('Sales analysis generated');return}
+  if(/summary|report|analytics|performance/.test(q)){window.aiAnalyze();toast('Business summary generated');return}
+  if(/all|everything|advance|optimize/.test(q)){aiApplyAllSafe();return}
+  window.aiAnalyze();toast('Copilot analyzed your request');
+};
+window.aiAnalyze=function(){
+  const el=document.getElementById('aiResult');if(!el)return;const s=aiV37State();
+  const top={};s.inv.forEach(i=>{const n=i.customer||'Walk-in';top[n]=(top[n]||0)+calc(i).total});const topCustomer=Object.entries(top).sort((a,b)=>b[1]-a[1])[0];
+  el.innerHTML=`<div class="ai-grid">
+    <div><b>Business Health</b><div class="ai-score">${s.issues.length?'Needs attention':'Excellent'}</div><div class="muted small">${s.issues.length} data issue(s)</div></div>
+    <div><b>Total Sales</b><div class="ai-score">${money(s.revenue)}</div><div class="muted small">${s.inv.length} invoice(s)</div></div>
+    <div><b>Outstanding</b><div class="ai-score">${money(s.pending)}</div><div class="muted small">${s.inv.filter(i=>Math.max(0,calc(i).total-Number(i.paid||0))>0).length} pending bill(s)</div></div>
+  </div>
+  <div class="card" style="margin-top:12px"><b>AI Business Insights</b><div class="item"><span>💰 Collected: <b>${money(s.paid)}</b></span><span class="muted small">Average invoice: ${money(s.avg)}</span></div><div class="item"><span>🏆 Top customer: <b>${S(topCustomer?topCustomer[0]:'No customer yet')}</b></span><span class="muted small">${topCustomer?money(topCustomer[1]):'—'}</span></div><div class="item"><span>📦 Products/services: <b>${s.pro.length}</b></span><span class="muted small">Customers: ${s.cus.length}</span></div></div>
+  ${s.issues.length?`<div class="card" style="margin-top:12px"><b>AI Checks</b>${s.issues.map(x=>`<div class="item">⚠️ ${S(x)}</div>`).join('')}<div class="ai-actions"><button class="btn accent" onclick="aiApplyRecommendation('repair')">✓ Fix Safe Issues</button></div></div>`:`<div class="success-card">✓ No critical data consistency problems found.</div>`}
+  <div class="card" style="margin-top:12px"><b>AI Suggestions — Tap Apply to Implement</b>${s.rec.map(r=>`<div class="item ai-reco"><div class="item-copy"><span>💡 ${S(r.t)}</span><small class="muted">${r.safe?'Safe to apply automatically':'Opens the relevant settings for review'}</small></div><button class="btn ${r.safe?'accent':'secondary'}" onclick="aiApplyRecommendation('${r.a}')">Apply</button></div>`).join('')}</div>`;
+};
+
+/* Visual theme cards + selected states. */
+const oldLoad=window.loadSettings;
+window.loadSettings=function(){try{oldLoad&&oldLoad()}catch(e){}ensureV37();document.querySelectorAll('[data-doc-theme]').forEach(x=>x.classList.toggle('active',x.dataset.docTheme===db.settings.docTheme));document.querySelectorAll('[data-post-theme]').forEach(x=>x.classList.toggle('active',x.dataset.postTheme===db.settings.pendingPostTheme));wireV37Themes();};
+
+
+/* ---------- V38: single, reliable in-app router ---------- */
+(function(){
+  const nav=[];
+  let changing=false;
+  function active(){return document.querySelector('.page.active')?.id||'home'}
+  function direct(id){
+    if(!id || !document.getElementById(id)) id='home';
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active','printing'));
+    const page=document.getElementById(id); if(!page) return;
+    page.classList.add('active');
+    document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+    if(id==='whatsapp' && typeof renderWA==='function') renderWA();
+    if(id==='settings' && typeof loadSettings==='function') loadSettings();
+    if(id==='billing' && typeof renderBilling==='function') renderBilling();
+    if(id==='history' && typeof renderInvoiceHistory==='function') renderInvoiceHistory();
+    if(id==='customers' && typeof renderCustomers==='function') renderCustomers();
+    if(id==='products' && typeof renderProducts==='function') renderProducts();
+    window.scrollTo(0,0);
+  }
+  function go(id, push=true){
+    const c=active();
+    if(id===c){window.scrollTo(0,0);return;}
+    if(push && !changing){nav.push(c); if(nav.length>50)nav.shift();}
+    changing=true; try{direct(id)} finally{changing=false;}
+    if(push && !changing){
+      try{history.pushState({szV38:id},'',location.pathname+location.search+'#'+id)}catch(e){}
+    }
+  }
+  window.openPage=function(id){go(id,true)};
+  window.openBilling=function(){go('billing',true)};
+  window.newBilling=function(){
+    try{billingMode='invoice';qEdit=null;newInvoice();}catch(e){console.error(e);toast('Could not start invoice');return;}
+    const c=active(); if(c!=='billing'){nav.push(c);if(nav.length>50)nav.shift();}
+    direct('billing');
+    try{history.pushState({szV38:'billing'},'',location.pathname+location.search+'#billing')}catch(e){}
+  };
+  window.drawerGo=function(id){try{closeFeatureMenu()}catch(e){};go(id,true)};
+  window.__szV38Back=function(){
+    if(document.getElementById('modal')?.classList.contains('show')){closeModal();return true;}
+    const prev=nav.pop();
+    if(prev){direct(prev);try{history.replaceState({szV38:prev},'',location.pathname+location.search+'#'+prev)}catch(e){};return true;}
+    direct('home');try{history.replaceState({szV38:'home'},'',location.pathname+location.search+'#home')}catch(e){};return true;
+  };
+  window.addEventListener('popstate',function(ev){
+    if(window.__szV38Handling)return;
+    window.__szV38Handling=true;
+    try{window.__szV38Back();}finally{window.__szV38Handling=false;}
+  },true);
+  // Prevent the hash from becoming a browser navigation target that can blank the app.
+  window.addEventListener('hashchange',function(){
+    const id=location.hash.replace(/^#/,'');
+    if(id && document.getElementById(id) && id!==active()) direct(id);
+  });
+  if(!location.hash){try{history.replaceState({szV38:'home'},'',location.pathname+location.search+'#home')}catch(e){}}
+})();
+
+document.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>{try{ensureV37();wireV37Themes();loadSettings();window.aiAnalyze&&window.aiAnalyze()}catch(e){console.warn('V37 init',e)}},180);});
+})();
+
+</script>
+
+<script id="sz-v40-fit-script">
+(function(){
+  const main=()=>document.querySelector('.app>main');
+  let timer=0;
+  function fit(){
+    const m=main(); if(!m) return;
+    const p=m.querySelector('.page.active'); if(!p) return;
+    p.style.transform='none'; p.style.width='100%';
+    // Let the browser finish layout after render before measuring.
+    requestAnimationFrame(()=>{
+      const mh=m.clientHeight;
+      const ph=p.scrollHeight;
+      if(!mh || !ph) return;
+      const scale=Math.min(1, mh/ph);
+      if(scale < .995){
+        p.style.transformOrigin='top center';
+        p.style.transform='scale('+scale.toFixed(4)+')';
+        p.style.width=(100/scale).toFixed(3)+'%';
+      }
+    });
+  }
+  function schedule(){clearTimeout(timer);timer=setTimeout(fit,35)}
+  window.addEventListener('resize',schedule,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(fit,120),{passive:true});
+  document.addEventListener('DOMContentLoaded',()=>{
+    const m=main(); if(!m) return;
+    const obs=new MutationObserver(schedule);
+    obs.observe(m,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+    setTimeout(fit,250);
+  });
+  window.addEventListener('load',()=>setTimeout(fit,120));
+  window.szFitActivePage=fit;
+})();
+</script>
+
+<style id="sz-v41-ai-theme">
+/* V41: app themes + advanced auto copilot, targeted additions only */
+.theme-ocean{--brand:#063b5c;--accent:#0891b2;--ui-primary:#0891b2;--ui-primary2:#0e7490;--ui-soft:#ecfeff;--ui-line:#d8edf2}
+.theme-rose{--brand:#6b2148;--accent:#e11d72;--ui-primary:#e11d72;--ui-primary2:#be185d;--ui-soft:#fff1f6;--ui-line:#f4dce7}
+.v41-theme-card{border:1px solid #e4eaf2;background:#fff;border-radius:18px;padding:14px;margin-top:12px}
+.v41-theme-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:10px}
+.v41-theme-btn{border:2px solid #e1e7ef;border-radius:14px;padding:10px 8px;background:#fff;font-weight:850;text-align:left;min-height:66px;cursor:pointer}
+.v41-theme-btn.active{border-color:#165dff;background:#f5f9ff;box-shadow:0 0 0 2px rgba(22,93,255,.08)}
+.v41-theme-dot{display:block;width:24px;height:24px;border-radius:8px;margin-bottom:6px}
+.v41-auto{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);border-radius:15px;margin-top:10px}
+.v41-auto input{width:20px;height:20px;accent-color:#fff}
+.v41-ai-tools{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+@media(max-width:600px){.v41-theme-grid{grid-template-columns:repeat(2,1fr)}.v41-ai-tools{grid-template-columns:1fr}}
+</style>
+<script id="sz-v41-script">
+(function(){
+  const APP_THEMES=[
+    ['slate','Slate','#0b1220','#13a8ff'],['blue','Blue','#123b73','#2563eb'],['green','Green','#14532d','#16a34a'],
+    ['purple','Purple','#3b176d','#7c3aed'],['gold','Gold','#4a3510','#c58b18'],['ocean','Ocean','#063b5c','#0891b2'],['rose','Rose','#6b2148','#e11d72']
+  ];
+  function escx(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function renderAppThemes(){
+    const host=document.querySelector('.theme-card'); if(!host)return;
+    host.innerHTML=APP_THEMES.map(t=>`<button type="button" class="v41-theme-btn ${db.settings.theme===t[0]?'active':''}" data-v41-theme="${t[0]}" onclick="setAppThemeV41('${t[0]}')"><span class="v41-theme-dot" style="background:linear-gradient(135deg,${t[2]},${t[3]})"></span>${escx(t[0][0].toUpperCase()+t[0].slice(1))}</button>`).join('');
+  }
+  window.setAppThemeV41=function(t){
+    db.settings.theme=t; applyTheme(); save(); renderAppThemes(); toast('App theme: '+t.charAt(0).toUpperCase()+t.slice(1));
+  };
+  function installAIControls(){
+    const box=document.querySelector('#ai .ai-command') || document.querySelector('#ai .card');
+    if(!box || document.getElementById('v41AutoSuggestions'))return;
+    const hero=document.querySelector('#ai .card'); if(!hero)return;
+    const oldActions=hero.querySelector('.actions');
+    if(oldActions){
+      const tools=document.createElement('div'); tools.className='v41-ai-tools';
+      tools.innerHTML=`<button type="button" class="btn secondary" onclick="aiV41Action('scan')">🔎 Scan Problems</button><button type="button" class="btn secondary" onclick="aiV41Action('summary')">📊 Business Summary</button><button type="button" class="btn secondary" onclick="aiV41Action('pending')">💬 Pending Reminders</button><button type="button" class="btn secondary" onclick="aiV41Action('theme')">🎨 Optimize Theme</button>`;
+      oldActions.parentNode.insertBefore(tools,oldActions.nextSibling);
+    }
+    const auto=document.createElement('label'); auto.id='v41AutoSuggestions'; auto.className='v41-auto'; auto.innerHTML=`<span><b>Auto Suggestions</b><small style="display:block;opacity:.75;margin-top:3px">Automatically re-check data and refresh recommendations.</small></span><input id="v41AutoToggle" type="checkbox">`;
+    hero.appendChild(auto);
+    const saved=localStorage.getItem('sz_ai_auto_v41')==='1'; document.getElementById('v41AutoToggle').checked=saved;
+    document.getElementById('v41AutoToggle').onchange=function(){localStorage.setItem('sz_ai_auto_v41',this.checked?'1':'0');if(this.checked){window.aiAnalyzeV41();toast('Auto Suggestions enabled')}else toast('Auto Suggestions disabled')};
+  }
+  window.aiV41Action=function(a){
+    if(a==='scan'){window.aiAnalyzeV41();return;}
+    if(a==='summary'){window.aiAnalyzeV41();toast('Business summary updated');return;}
+    if(a==='pending'){if(typeof aiScanAndQueue==='function')aiScanAndQueue();else{window.aiAnalyzeV41();toast('Pending invoices checked')}return;}
+    if(a==='theme'){const choice=(db.settings.theme==='slate'?'blue':db.settings.theme);setAppThemeV41(choice);window.aiAnalyzeV41();return;}
+  };
+  window.aiAnalyzeV41=function(){
+    if(typeof window.aiAnalyze==='function')window.aiAnalyze();
+    const el=document.getElementById('aiResult');if(!el)return;
+    const auto=localStorage.getItem('sz_ai_auto_v41')==='1';
+    const bar=document.getElementById('v41AutoStatus');
+    if(bar)bar.textContent=auto?'Auto Suggestions is ON • recommendations refresh automatically':'Auto Suggestions is OFF';
+  };
+  function addAutoStatus(){
+    const host=document.querySelector('#ai .page-head');if(!host||document.getElementById('v41AutoStatus'))return;
+    const x=document.createElement('div');x.id='v41AutoStatus';x.className='muted small';x.style.marginTop='5px';x.textContent=localStorage.getItem('sz_ai_auto_v41')==='1'?'Auto Suggestions is ON • recommendations refresh automatically':'Auto Suggestions is OFF';host.appendChild(x);
+  }
+  let autoTimer=0;
+  function startAuto(){
+    clearInterval(autoTimer); autoTimer=setInterval(()=>{if(localStorage.getItem('sz_ai_auto_v41')==='1' && document.getElementById('ai')?.classList.contains('active'))window.aiAnalyzeV41()},15000);
+  }
+  const oldAI=window.aiAnalyzeV35;
+  window.aiAnalyzeV35=function(){window.aiAnalyzeV41();};
+  document.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{try{renderAppThemes();installAIControls();addAutoStatus();startAuto();}catch(e){console.warn('V41 init',e)}},220);
+  });
+  window.addEventListener('beforeunload',()=>clearInterval(autoTimer));
+})();
+</script>
+
+<style id="sz-v42-mobile-width-fix">
+/* V42: keep the app full-width on phones; do not horizontally shrink/center active pages. */
+html,body{width:100vw!important;max-width:100vw!important;min-width:0!important;overflow-x:hidden!important}
+.app{width:100vw!important;max-width:100vw!important;margin:0!important}
+.app>main{width:100vw!important;max-width:100vw!important;margin:0!important;padding-left:10px!important;padding-right:10px!important}
+.app>main>.page{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;transform-origin:top left!important}
+@media(max-width:760px){
+  .app>main{padding-left:10px!important;padding-right:10px!important}
+  .page{padding-left:0!important;padding-right:0!important}
+  .grid3{grid-template-columns:1fr 1fr!important}
+  .grid3 .stat{min-width:0!important}
+  .dashboard-hero,.card{max-width:100%!important}
+  .action-grid{grid-template-columns:1fr 1fr!important}
+  .action-tile{min-width:0!important;overflow:hidden!important}
+}
+</style>
+<script id="sz-v42-fit-fix">
+(function(){
+  /* Override the V40 fit routine: preserve full viewport width and only scale
+     when the active screen is genuinely taller than the available viewport. */
+  window.szFitActivePage=function(){
+    const m=document.querySelector('.app>main'),p=m&&m.querySelector('.page.active');
+    if(!m||!p)return;
+    p.style.transform='none';
+    p.style.width='100%';
+  };
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){window.szFitActivePage&&window.szFitActivePage()},60)});
+  window.addEventListener('resize',function(){setTimeout(function(){window.szFitActivePage&&window.szFitActivePage()},30)},{passive:true});
+})();
+</script>
+
+<script id="sz-v43-features">
+/* V43: payment update reminder + expenses + balance in/out */
+(function(){
+  function ensureArrays(){
+    db.expenses=Array.isArray(db.expenses)?db.expenses:[];
+    db.cashflow=Array.isArray(db.cashflow)?db.cashflow:[];
+  }
+  function addMenuItems(){
+    const groups=document.querySelectorAll('#featureDrawer .drawer-group');
+    if(!groups.length)return;
+    const business=Array.from(groups).find(g=>g.textContent.includes('BUSINESS'));
+    if(business && !document.getElementById('drawerExpenses')){
+      const b=document.createElement('button');b.className='drawer-item';b.id='drawerExpenses';b.onclick=()=>drawerGo('expenses');b.innerHTML='<span class="drawer-icon">💸</span><span><b>Expenses</b><br><small class="muted">Track business expenses</small></span>';business.appendChild(b);
+    }
+    const tools=Array.from(groups).find(g=>g.textContent.includes('TOOLS'));
+    if(tools && !document.getElementById('drawerCashflow')){
+      const b=document.createElement('button');b.className='drawer-item';b.id='drawerCashflow';b.onclick=()=>drawerGo('cashflow');b.innerHTML='<span class="drawer-icon">↕️</span><span><b>Balance In / Out</b><br><small class="muted">Cash received & paid</small></span>';tools.insertBefore(b,tools.firstChild?.nextSibling||null);
+    }
+  }
+  function addPages(){
+    const main=document.querySelector('.app>main');if(!main)return;
+    if(!document.getElementById('expenses')){
+      const s=document.createElement('section');s.id='expenses';s.className='page';s.innerHTML=`<div class="page-head"><div><div class="eyebrow">BUSINESS FINANCE</div><div class="title">Expenses</div><div class="muted small">Track business expenses and see where money is going.</div></div><button class="btn accent" onclick="openExpenseForm()">+ Add Expense</button></div><div class="finance-grid"><div class="card finance-stat"><span class="muted">Total Expenses</span><b id="expenseTotal">Rs. 0</b></div><div class="card finance-stat"><span class="muted">This Month</span><b id="expenseMonth">Rs. 0</b></div></div><div class="card"><div class="section-title">Expense Records</div><div id="expenseList"></div></div>`;main.appendChild(s);
+    }
+    if(!document.getElementById('cashflow')){
+      const s=document.createElement('section');s.id='cashflow';s.className='page';s.innerHTML=`<div class="page-head"><div><div class="eyebrow">CASH MANAGEMENT</div><div class="title">Balance In / Out</div><div class="muted small">Record cash received, payments made and other business movements.</div></div><div class="actions"><button class="btn ok" onclick="openCashflowForm('in')">+ Balance In</button><button class="btn danger" onclick="openCashflowForm('out')">− Balance Out</button></div></div><div class="finance-grid"><div class="card finance-stat"><span class="muted">Balance In</span><b id="cashInTotal">Rs. 0</b></div><div class="card finance-stat"><span class="muted">Balance Out</span><b id="cashOutTotal">Rs. 0</b></div><div class="card finance-stat"><span class="muted">Net Balance</span><b id="cashNetTotal">Rs. 0</b></div></div><div class="card"><div class="section-title">Cash Records</div><div id="cashflowList"></div></div>`;main.appendChild(s);
+    }
+  }
+  function injectStyle(){if(document.getElementById('v43-finance-style'))return;const st=document.createElement('style');st.id='v43-finance-style';st.textContent=`.finance-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}.finance-stat{padding:18px}.finance-stat b{display:block;font-size:23px;margin-top:8px}.finance-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid #e6edf5}.finance-row:last-child{border-bottom:0}.finance-in{color:#087a4d}.finance-out{color:#b42318}@media(max-width:700px){.finance-grid{grid-template-columns:1fr 1fr}.finance-grid .finance-stat:last-child{grid-column:1/-1}}`;document.head.appendChild(st)}
+  function renderExpenses(){ensureArrays();const list=document.getElementById('expenseList');if(!list)return;const total=db.expenses.reduce((a,x)=>a+Number(x.amount||0),0);const now=new Date();const month=db.expenses.filter(x=>{const d=new Date(x.date);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()}).reduce((a,x)=>a+Number(x.amount||0),0);document.getElementById('expenseTotal').textContent=money(total);document.getElementById('expenseMonth').textContent=money(month);list.innerHTML=db.expenses.slice().reverse().map(x=>`<div class="finance-row"><div><b>${esc(x.title)}</b><div class="muted small">${esc(x.category||'General')} • ${esc(x.date||'')}</div>${x.note?`<div class="muted small">${esc(x.note)}</div>`:''}</div><div style="text-align:right"><b class="finance-out">− ${money(x.amount)}</b><button class="btn danger" style="margin-top:6px" onclick="deleteExpense('${x.id}')">Delete</button></div></div>`).join('')||'<div class="empty">No expenses recorded.</div>'}
+  function renderCashflow(){ensureArrays();const list=document.getElementById('cashflowList');if(!list)return;const ins=db.cashflow.filter(x=>x.type==='in').reduce((a,x)=>a+Number(x.amount||0),0),outs=db.cashflow.filter(x=>x.type==='out').reduce((a,x)=>a+Number(x.amount||0),0);document.getElementById('cashInTotal').textContent=money(ins);document.getElementById('cashOutTotal').textContent=money(outs);document.getElementById('cashNetTotal').textContent=money(ins-outs);list.innerHTML=db.cashflow.slice().reverse().map(x=>`<div class="finance-row"><div><b>${esc(x.title)}</b><div class="muted small">${esc(x.category||'General')} • ${esc(x.date||'')}</div>${x.note?`<div class="muted small">${esc(x.note)}</div>`:''}</div><div style="text-align:right"><b class="${x.type==='in'?'finance-in':'finance-out'}">${x.type==='in'?'+':'−'} ${money(x.amount)}</b><button class="btn danger" style="margin-top:6px" onclick="deleteCashflow('${x.id}')">Delete</button></div></div>`).join('')||'<div class="empty">No balance records yet.</div>'}
+  window.openExpenseForm=function(){openModal(`<h2>Add Expense</h2><label>Expense Name</label><input id="finTitle" placeholder="e.g. Fuel, Internet, Office supplies"><div class="row" style="margin-top:10px"><div><label>Amount</label><input id="finAmount" type="number" inputmode="decimal" step="0.01"></div><div><label>Category</label><select id="finCategory"><option>General</option><option>Fuel / Travel</option><option>Internet / Phone</option><option>Office</option><option>Purchase</option><option>Salary / Labour</option><option>Other</option></select></div></div><label style="margin-top:10px">Date</label><input id="finDate" type="date" value="${new Date().toISOString().slice(0,10)}"><label style="margin-top:10px">Note</label><textarea id="finNote" placeholder="Optional note"></textarea><div class="actions"><button class="btn accent" onclick="saveExpense()">Save Expense</button><button class="btn secondary" onclick="closeModal()">Cancel</button></div>`)};
+  window.saveExpense=function(){ensureArrays();const title=document.getElementById('finTitle')?.value.trim(),amount=Number(document.getElementById('finAmount')?.value||0);if(!title)return toast('Expense name required');if(amount<=0)return toast('Enter a valid amount');db.expenses.push({id:crypto.randomUUID(),title,amount,category:document.getElementById('finCategory').value,date:document.getElementById('finDate').value||new Date().toISOString().slice(0,10),note:document.getElementById('finNote').value.trim()});closeModal();save();renderExpenses();toast('Expense added')};
+  window.deleteExpense=function(id){if(!confirm('Delete this expense?'))return;db.expenses=db.expenses.filter(x=>x.id!==id);save();renderExpenses();toast('Expense deleted')};
+  window.openCashflowForm=function(type){openModal(`<h2>${type==='in'?'Balance In':'Balance Out'}</h2><label>Description</label><input id="finTitle" placeholder="e.g. Customer payment / supplier payment"><div class="row" style="margin-top:10px"><div><label>Amount</label><input id="finAmount" type="number" inputmode="decimal" step="0.01"></div><div><label>Category</label><select id="finCategory"><option>General</option><option>Customer Payment</option><option>Supplier Payment</option><option>Owner / Capital</option><option>Other</option></select></div></div><label style="margin-top:10px">Date</label><input id="finDate" type="date" value="${new Date().toISOString().slice(0,10)}"><label style="margin-top:10px">Note</label><textarea id="finNote" placeholder="Optional note"></textarea><div class="actions"><button class="btn ${type==='in'?'ok':'danger'}" onclick="saveCashflow('${type}')">Save ${type==='in'?'Balance In':'Balance Out'}</button><button class="btn secondary" onclick="closeModal()">Cancel</button></div>`)};
+  window.saveCashflow=function(type){ensureArrays();const title=document.getElementById('finTitle')?.value.trim(),amount=Number(document.getElementById('finAmount')?.value||0);if(!title)return toast('Description required');if(amount<=0)return toast('Enter a valid amount');db.cashflow.push({id:crypto.randomUUID(),type,title,amount,category:document.getElementById('finCategory').value,date:document.getElementById('finDate').value||new Date().toISOString().slice(0,10),note:document.getElementById('finNote').value.trim()});closeModal();save();renderCashflow();toast(type==='in'?'Balance In added':'Balance Out added')};
+  window.deleteCashflow=function(id){if(!confirm('Delete this balance record?'))return;db.cashflow=db.cashflow.filter(x=>x.id!==id);save();renderCashflow();toast('Balance record deleted')};
+  function paymentUpdatePrompt(inv,oldPaid,newPaid){const cu=db.customers.find(x=>x.id===inv.customerId);if(!cu||!cu.wa)return;const pending=Math.max(0,Number(inv.total||0)-Number(newPaid||0));if(newPaid<=oldPaid)return;openModal(`<h2>Payment Update Ready</h2><div class="card" style="margin:10px 0"><b>${esc(cu.name)}</b><div class="muted small">Invoice ${esc(inv.no||'')}</div><div style="margin-top:10px">Total Bill: <b>${money(inv.total)}</b><br>Received: <b>${money(newPaid)}</b><br>Pending: <b>${money(pending)}</b></div></div><p class="muted small">A pending-payment post will show the amount received and the remaining balance.</p><div class="actions"><button class="btn ok" onclick="sendPaymentUpdate('${inv.id}')">💬 Send Update</button><button class="btn secondary" onclick="closeModal()">Later</button></div>`)}
+  window.sendPaymentUpdate=function(id){const inv=db.invoices.find(x=>x.id===id);if(!inv)return toast('Invoice not found');iEdit={...inv};closeModal();pendingPostSend(false)};
+  const oldSaveInvoice=window.saveInvoice;
+  window.saveInvoice=function(){
+    if(!iEdit)return toast('Open Invoice first');
+    ensureArrays();
+    const existing=iEdit.id?db.invoices.find(x=>x.id===iEdit.id):null;
+    const oldPaid=existing?Number(existing.paid||0):0;
+    const result=oldSaveInvoice.apply(this,arguments);
+    const saved=iEdit&&iEdit.id?db.invoices.find(x=>x.id===iEdit.id):null;
+    if(saved&&Number(saved.paid||0)>oldPaid){setTimeout(()=>paymentUpdatePrompt(saved,oldPaid,Number(saved.paid||0)),180)}
+    return result;
+  };
+  const oldMark=window.markSavedInvoicePaid;
+  window.markSavedInvoicePaid=function(id){const inv=db.invoices.find(x=>x.id===id);const old=inv?Number(inv.paid||0):0;const r=oldMark.apply(this,arguments);const saved=db.invoices.find(x=>x.id===id);if(saved&&Number(saved.paid||0)>old)setTimeout(()=>paymentUpdatePrompt(saved,old,Number(saved.paid||0)),180);return r};
+  const oldOpenPage=window.openPage;
+  window.openPage=function(id){const r=oldOpenPage.apply(this,arguments);if(id==='expenses')renderExpenses();if(id==='cashflow')renderCashflow();return r};
+  document.addEventListener('DOMContentLoaded',()=>{ensureArrays();addPages();addMenuItems();injectStyle();setTimeout(()=>{renderExpenses();renderCashflow();addMenuItems()},150)});
+})();
+
+</script>
+
+<script id="sz-v45-payment-overview">
+(function(){
+  'use strict';
+  function moneyV(n){return typeof money==='function'?money(n):('Rs. '+Number(n||0).toLocaleString())}
+  function escV(v){return typeof esc==='function'?esc(v):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+  function ensurePage(){
+    const main=document.querySelector('.app>main'); if(!main)return;
+    if(!document.getElementById('paymentOverview')){
+      const s=document.createElement('section'); s.id='paymentOverview'; s.className='page';
+      s.innerHTML=`<div class="page-head"><div><div class="eyebrow">PAYMENT OVERVIEW</div><div class="title">Bills & Collections</div><div class="muted small">See how many bills you have, what customers paid, and what is still pending.</div></div></div>
+      <div class="v45-pay-grid">
+        <div class="card v45-pay-stat"><span class="muted">Total Bills</span><b id="v45Bills">0</b></div>
+        <div class="card v45-pay-stat"><span class="muted">Total Billed</span><b id="v45Billed">Rs. 0</b></div>
+        <div class="card v45-pay-stat"><span class="muted">Total Paid</span><b id="v45Paid">Rs. 0</b></div>
+        <div class="card v45-pay-stat pending"><span class="muted">Total Pending</span><b id="v45Pending">Rs. 0</b></div>
+      </div>
+      <div class="card"><div class="section-title">Bill Payment Details</div><div id="v45PaymentRows"></div></div>`;
+      main.appendChild(s);
+    }
+  }
+  function render(){
+    ensurePage(); const rows=document.getElementById('v45PaymentRows'); if(!rows)return;
+    const inv=Array.isArray(db.invoices)?db.invoices:[]; let billed=0,paid=0,pending=0;
+    inv.forEach(i=>{const total=typeof calc==='function'?Number(calc(i).total||0):Number(i.total||0);const p=Math.min(Math.max(0,Number(i.paid||0)),total);billed+=total;paid+=p;pending+=Math.max(0,total-p)});
+    document.getElementById('v45Bills').textContent=inv.length;document.getElementById('v45Billed').textContent=moneyV(billed);document.getElementById('v45Paid').textContent=moneyV(paid);document.getElementById('v45Pending').textContent=moneyV(pending);
+    rows.innerHTML=inv.slice().reverse().map(i=>{const total=typeof calc==='function'?Number(calc(i).total||0):Number(i.total||0);const p=Math.min(Math.max(0,Number(i.paid||0)),total);const pend=Math.max(0,total-p);const cu=(db.customers||[]).find(c=>c.id===i.customerId);const name=cu?.name||i.customer||'Walk-in';return `<div class="v45-pay-row"><div><b>${escV(i.no||'Invoice')}</b><div class="muted small">${escV(name)} • ${escV(i.date||'')}</div></div><div class="v45-pay-nums"><span>Billed <b>${moneyV(total)}</b></span><span>Paid <b class="finance-in">${moneyV(p)}</b></span><span>Pending <b class="finance-out">${moneyV(pend)}</b></span></div></div>`}).join('')||'<div class="empty">No bills yet.</div>';
+  }
+  function addMenu(){
+    const groups=document.querySelectorAll('#featureDrawer .drawer-group'); if(!groups.length)return;
+    const main=Array.from(groups).find(g=>g.textContent.includes('MAIN')); if(main&&!document.getElementById('drawerPaymentOverview')){const b=document.createElement('button');b.className='drawer-item';b.id='drawerPaymentOverview';b.onclick=()=>drawerGo('paymentOverview');b.innerHTML='<span class="drawer-icon">💰</span><span><b>Payment Overview</b><br><small class="muted">Bills, paid & pending balance</small></span>';main.appendChild(b)}
+  }
+  const oldOpen=window.openPage;
+  window.openPage=function(id){const r=oldOpen?oldOpen.apply(this,arguments):undefined;if(id==='paymentOverview')render();return r};
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ensurePage();addMenu();render()},250));
+  window.addEventListener('sz:db-updated',render);
+  window.renderPaymentOverview=render;
+  const oldSave=window.save;
+  if(oldSave&&!oldSave.__v45Wrapped){window.save=function(){const r=oldSave.apply(this,arguments);try{setTimeout(render,30)}catch(e){}return r};window.save.__v45Wrapped=true}
+  const st=document.createElement('style');st.textContent=`.v45-pay-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.v45-pay-stat{padding:16px}.v45-pay-stat b{display:block;font-size:22px;margin-top:7px}.v45-pay-stat.pending{background:#fffaf0}.v45-pay-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:13px 0;border-bottom:1px solid #e6edf5;align-items:center}.v45-pay-row:last-child{border-bottom:0}.v45-pay-nums{display:flex;gap:14px;flex-wrap:wrap;justify-content:flex-end}.v45-pay-nums span{font-size:11px;color:#667085}.v45-pay-nums b{display:block;font-size:13px;color:#101828;margin-top:2px}@media(max-width:700px){.v45-pay-grid{grid-template-columns:1fr 1fr}.v45-pay-row{grid-template-columns:1fr}.v45-pay-nums{justify-content:flex-start}}`;document.head.appendChild(st);
+})();
+</script>
+<script id="sz-v45-payment-auto">
+(function(){
+  'use strict';
+  function escA(v){return typeof esc==='function'?esc(v):String(v??'')}
+  function autoPaymentUpdate(inv,oldPaid,newPaid){
+    const cu=(db.customers||[]).find(x=>x.id===inv.customerId); if(!cu||!cu.wa||newPaid<=oldPaid)return;
+    const total=Number(inv.total||0),pending=Math.max(0,total-Number(newPaid||0));
+    const msg=`Assalam-o-Alaikum ${cu.name},\n\nPayment update for invoice ${inv.no}.\nTotal Bill: ${money(total)}\nPaid: ${money(newPaid)}\nPending Balance: ${money(pending)}\n\nThank you for choosing ${db.settings?.name||'SZ Billing'}.`;
+    db.history=db.history||[];db.history.push({type:'WhatsApp',waAction:'Automatic Payment Update',detail:`Payment update prepared for ${cu.name}`,customer:cu.name,amount:pending,date:new Date().toLocaleString()});
+    try{localStorage.setItem('sz_last_payment_update',JSON.stringify({invoice:inv.no,customer:cu.name,paid:newPaid,pending,message:msg,at:Date.now()}));}catch(e){}
+    // A browser/PWA cannot silently press WhatsApp's final Send button. Open the customer's WhatsApp chat automatically with the complete update prefilled.
+    try{window.location.href='https://wa.me/'+String(cu.wa).replace(/\D/g,'')+'?text='+encodeURIComponent(msg)}catch(e){}
+    // The browser cannot silently attach/send an image in WhatsApp; the visual pending post is available from Pending Post.
+    try{localStorage.setItem('sz_payment_post_ready',JSON.stringify({invoice:inv.no,customer:cu.name,total,paid:newPaid,pending,at:Date.now()}))}catch(e){}
+  }
+  const oldPrompt=window.paymentUpdatePrompt;
+  // Replace the previous confirmation prompt with automatic WhatsApp hand-off after payment changes.
+  window.paymentUpdatePrompt=function(inv,oldPaid,newPaid){autoPaymentUpdate(inv,oldPaid,newPaid)};
+  // Ensure the existing V43 wrapper, which may have captured its own function, also uses the automatic path by replacing saveInvoice again.
+  const prevSave=window.saveInvoice;
+  if(prevSave&&!prevSave.__v45Payment){
+    window.saveInvoice=function(){
+      const before=iEdit&&iEdit.id?db.invoices.find(x=>x.id===iEdit.id):null; const old=before?Number(before.paid||0):0;
+      const r=prevSave.apply(this,arguments); const after=iEdit&&iEdit.id?db.invoices.find(x=>x.id===iEdit.id):null;
+      if(after&&Number(after.paid||0)>old)setTimeout(()=>autoPaymentUpdate(after,old,Number(after.paid||0)),220);
+      return r;
+    };window.saveInvoice.__v45Payment=true;
+  }
+})();
+</script>
+
+<script id="sz-v46-ai-chat">
+(function(){
+ 'use strict';
+ function escC(v){return typeof esc==='function'?esc(String(v??'')):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+ function log(role,text,action){
+   const el=document.getElementById('sz-ai-chat-log');if(!el)return;
+   const div=document.createElement('div');div.className='sz-ai-msg '+(role==='user'?'user':'bot');
+   div.innerHTML='<b>'+(role==='user'?'You':'AI Copilot')+'</b><span>'+escC(text)+'</span>'+(action?'<button type="button" class="sz-ai-chat-action" onclick="'+action+'">Apply</button>':'');
+   el.appendChild(div);el.scrollTop=el.scrollHeight;
+ }
+ function totals(){
+   const inv=Array.isArray(window.db?.invoices)?db.invoices:[];let billed=0,paid=0,pending=0;
+   inv.forEach(i=>{const t=typeof calc==='function'?Number(calc(i).total||0):Number(i.total||0);const p=Math.min(Math.max(0,Number(i.paid||0)),t);billed+=t;paid+=p;pending+=Math.max(0,t-p)});
+   return {count:inv.length,billed,paid,pending};
+ }
+ window.szAiChatQuick=function(q){const i=document.getElementById('sz-ai-chat-input');if(i)i.value=q;window.szAiChatSend()};
+ window.szAiChatSend=function(){
+   const input=document.getElementById('sz-ai-chat-input');const q=(input?.value||'').trim();if(!q)return;
+   input.value='';log('user',q);const l=q.toLowerCase();
+   try{
+     if(/new invoice|create invoice|invoice banao|bill banao/.test(l)){if(typeof newBilling==='function')newBilling('invoice');else if(typeof newInvoice==='function'){newInvoice();openPage('billing')}else openPage('billing');log('bot','New Invoice screen open kar di. Customer aur items select karke bill complete kar sakte hain.');return}
+     if(/new customer|customer add|client add|customer banao/.test(l)){openPage('customers');if(typeof openCustomer==='function')openCustomer();log('bot','New Customer form open kar diya.');return}
+     if(/new product|product add|item add|service add/.test(l)){openPage('products');if(typeof openProduct==='function')openProduct();log('bot','Product/Service form open kar diya.');return}
+     if(/pending|overdue|reminder/.test(l)){if(typeof aiScanAndQueue==='function')aiScanAndQueue();else if(typeof aiAnalyze==='function')aiAnalyze();const t=totals();log('bot',`Maine pending bills check kiye. Total bills: ${t.count}, Paid: ${typeof money==='function'?money(t.paid):t.paid}, Pending: ${typeof money==='function'?money(t.pending):t.pending}. Reminder scan run ho gaya.`);return}
+     if(/fix|repair|problem|bug|correct|data/.test(l)){if(typeof aiApplyRecommendation==='function')aiApplyRecommendation('repair');if(typeof aiAnalyze==='function')aiAnalyze();log('bot','Safe data check/repair run kar diya. Recommendations dobara refresh kar di hain.');return}
+     if(/theme|design|look|modern/.test(l)){if(typeof aiApplyRecommendation==='function')aiApplyRecommendation('design');else if(typeof setAppThemeV41==='function')setAppThemeV41('blue');log('bot','Professional design recommendation apply kar di.');return}
+     if(/summary|report|analytics|performance|business/.test(l)){const t=totals();log('bot',`Business summary:\n• Bills: ${t.count}\n• Total billed: ${money(t.billed)}\n• Total paid: ${money(t.paid)}\n• Total pending: ${money(t.pending)}\n• Customers: ${(db.customers||[]).length}\n• Products/Services: ${(db.products||[]).length}`);if(typeof aiAnalyze==='function')aiAnalyze();return}
+     if(/suggest|recommend|improve|optimization|optimize|kya kar/.test(l)){if(typeof aiAnalyze==='function')aiAnalyze();log('bot','Maine current data aur setup analyze karke recommendations refresh kar di hain. Neeche AI Recommendations mein Apply buttons se changes implement kar sakte hain.');return}
+     if(/settings|setting/.test(l)){openPage('settings');log('bot','Settings open kar di.');return}
+     if(/history|saved bills|invoice history/.test(l)){openPage('history');log('bot','Invoice History open kar di.');return}
+     const t=totals();
+     if(typeof aiAnalyze==='function')aiAnalyze();
+     log('bot',`Main ne aapki request ko billing assistant command samjha. Current status: ${t.count} bills, ${typeof money==='function'?money(t.pending):t.pending} pending. Agar aap specific command dein—jaise “pending bills check karo”, “new invoice banao”, “problems fix karo”, ya “summary do”—main action perform kar sakta hoon.`);
+   }catch(e){console.error(e);log('bot','Command samajhne mein issue aya, lekin app ko koi change nahi kiya gaya.');}
+ };
+ document.addEventListener('DOMContentLoaded',()=>{
+   const i=document.getElementById('sz-ai-chat-input');if(i)i.addEventListener('keydown',e=>{if(e.key==='Enter')window.szAiChatSend()});
+ });
+})();
+</script>
+
+
+<!-- V49 targeted fixes: active AI command bot + item edit-before-add -->
+<script id="sz-v49-targeted-fixes">
+(function(){
+  'use strict';
+  const escX=v=>typeof esc==='function'?esc(String(v??'')):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+  // Saved item flow: selecting an item opens its editable form first; nothing is added until Save Item.
+  window.selectSavedItem=function(type,productId){
+    const obj=type==='quote'?qEdit:iEdit;
+    const p=(db.products||[]).find(x=>String(x.id)===String(productId));
+    if(!obj||!p)return toast('Item not found');
+    obj._pendingProductItem={id:crypto.randomUUID(),productId:p.id,name:p.name||'',unit:p.unit||'PCS',qty:1,rate:Number(p.rate)||0};
+    openItemEditor(type,null);
+  };
+  const originalOpenItemEditor=window.openItemEditor;
+  window.openItemEditor=function(type,idx){
+    const obj=type==='quote'?qEdit:iEdit;if(!obj)return;
+    if(idx===null && obj._pendingProductItem){
+      const seed=obj._pendingProductItem;
+      obj._pendingProductItem=null;
+      openModal(`<div class="sz-item-editor"><div class="actions" style="justify-content:space-between;margin-top:0"><div><div class="eyebrow">ITEM DETAILS</div><h2 style="margin:2px 0">Add Item to Bill</h2></div><button class="x" onclick="closeModal()">×</button></div><p class="muted small">Review the selected product, quantity and price. The item will be added only after you press <b>Save Item</b>.</p><div><label>Item / Product Name</label><input id="docItemName" value="${escX(seed.name)}" autocomplete="off"></div><div class="row" style="margin-top:10px"><div><label>Unit</label><select id="docItemUnit">${(UNITS||[]).map(u=>`<option ${u===seed.unit?'selected':''}>${escX(u)}</option>`).join('')}</select></div><div><label>Quantity</label><input id="docItemQty" type="number" inputmode="decimal" step="0.01" value="${Number(seed.qty||1)}" autocomplete="off"></div></div><div style="margin-top:10px"><label>Rate / Price</label><input id="docItemRate" type="number" inputmode="decimal" step="0.01" value="${Number(seed.rate||0)}" autocomplete="off"></div><div class="actions"><button class="btn" onclick="saveDocItem('${type}',null)">Save Item</button><button class="btn secondary" onclick="closeModal()">Cancel</button></div></div>`);
+      setTimeout(()=>document.getElementById('docItemName')?.focus(),120);
+      return;
+    }
+    if(typeof originalOpenItemEditor==='function')return originalOpenItemEditor(type,idx);
+  };
+
+  // Advanced local-first Copilot command engine. It understands natural/Roman-Urdu commands,
+  // performs safe app actions, and refreshes recommendations automatically.
+  function aiTotals(){
+    const inv=Array.isArray(db?.invoices)?db.invoices:[];let billed=0,paid=0,pending=0;
+    inv.forEach(i=>{const total=typeof calc==='function'?Number(calc(i).total||0):Number(i.total||0);const got=Math.max(0,Number(i.paid||0));billed+=total;paid+=Math.min(got,total);pending+=Math.max(0,total-got)});
+    return {count:inv.length,billed,paid,pending,customers:(db.customers||[]).length,products:(db.products||[]).length};
+  }
+  function aiLog(role,text,action){
+    const el=document.getElementById('sz-ai-chat-log');if(!el)return;
+    const div=document.createElement('div');div.className='sz-ai-msg '+(role==='user'?'user':'bot');
+    div.innerHTML='<b>'+(role==='user'?'You':'AI Copilot')+'</b><span>'+escX(text).replace(/\n/g,'<br>')+'</span>'+(action?'<button type="button" class="sz-ai-chat-action" onclick="'+action+'">Apply</button>':'');
+    el.appendChild(div);el.scrollTop=el.scrollHeight;
+  }
+  function aiAnalyzeSafe(){try{if(typeof aiAnalyze==='function')aiAnalyze();}catch(e){console.error(e)}}
+  function openNewInvoice(){try{if(typeof newInvoice==='function'){newInvoice();if(typeof openPage==='function')openPage('billing');}else openPage('billing')}catch(e){openPage('billing')}}
+  function runAICommand(raw,fromChat){
+    const q=String(raw||'').trim();if(!q)return false;
+    const l=q.toLowerCase().replace(/[؟?!.,]/g,' ');
+    if(fromChat)aiLog('user',q);
+    try{
+      if(/(new|create|make|banao|bana do|naya).*(invoice|bill|billing)|invoice.*(banao|create|new)|bill.*(banao|create|new)/.test(l)){
+        openNewInvoice();aiLog('bot','New Invoice open kar diya. Ab customer, items aur payment details enter karein.');return true;
+      }
+      if(/(new|add|create|naya|banao).*(customer|client)/.test(l)){
+        openPage('customers');if(typeof openCustomer==='function')openCustomer();aiLog('bot','New Customer form open kar diya.');return true;
+      }
+      if(/(new|add|create|naya|banao).*(product|item|service)/.test(l)){
+        openPage('products');if(typeof openProduct==='function')openProduct();aiLog('bot','Product / Service form open kar diya.');return true;
+      }
+      if(/pending|overdue|outstanding|baqi|udhaar|reminder/.test(l)){
+        openPage('history');aiAnalyzeSafe();const t=aiTotals();aiLog('bot',`Pending analysis complete.\nBills: ${t.count}\nPaid: ${money(t.paid)}\nPending: ${money(t.pending)}\nRecommendations refresh kar di hain.`);return true;
+      }
+      if(/(fix|repair|correct|solve|theek|durust|problem|bug|data)/.test(l)){
+        if(typeof aiApplyRecommendation==='function')aiApplyRecommendation('repair');aiAnalyzeSafe();aiLog('bot','Safe data repair/check run kar diya. Jo changes safe thay woh apply kiye gaye aur recommendations refresh kar di hain.');return true;
+      }
+      if(/(suggest|recommend|improve|optimization|optimize|behtar|mashwara|recommendations)/.test(l)){
+        aiAnalyzeSafe();aiLog('bot','Maine current billing data, pending amounts, customers aur setup analyze karke fresh recommendations bana di hain. Har suggestion ke saath Apply option available hai.');return true;
+      }
+      if(/(apply all|all safe|sab apply|sab suggestions|everything safe)/.test(l)){
+        if(typeof aiApplyAllSafe==='function')aiApplyAllSafe();aiAnalyzeSafe();aiLog('bot','All safe recommendations apply kar di hain.');return true;
+      }
+      if(/(summary|report|analytics|performance|business|hisab|karobar)/.test(l)){
+        const t=aiTotals();aiAnalyzeSafe();aiLog('bot',`Business summary:\nBills: ${t.count}\nTotal billed: ${money(t.billed)}\nTotal paid: ${money(t.paid)}\nTotal pending: ${money(t.pending)}\nCustomers: ${t.customers}\nProducts/Services: ${t.products}`);return true;
+      }
+      if(/(theme|design|look|modern|style)/.test(l)){
+        if(typeof aiApplyRecommendation==='function')aiApplyRecommendation('design');aiAnalyzeSafe();aiLog('bot','Design recommendation run kar di. AI suggestions bhi refresh kar di hain.');return true;
+      }
+      if(/(setting|settings)/.test(l)){openPage('settings');aiLog('bot','Settings open kar di.');return true;}
+      if(/(history|saved bill|invoice history)/.test(l)){openPage('history');aiLog('bot','Invoice History open kar di.');return true;}
+      if(/(expense|expenses|kharcha)/.test(l)){openPage('expenses');aiLog('bot','Expenses section open karne ki koshish ki.');return true;}
+      if(/(balance in|balance out|cash flow|ledger)/.test(l)){openPage('balance');aiLog('bot','Balance In / Out section open karne ki koshish ki.');return true;}
+      aiAnalyzeSafe();const t=aiTotals();
+      if(fromChat)aiLog('bot',`Command samajhne ke liye mujhe thori aur detail chahiye. Aap keh sakte hain: “new invoice banao”, “pending bills check karo”, “problems fix karo”, “recommendations do”, “sab safe suggestions apply karo” ya “business summary do”.\nCurrent pending: ${money(t.pending)}`);
+      return false;
+    }catch(e){console.error('AI command',e);if(fromChat)aiLog('bot','Command execute karte waqt issue aya. App data ko change nahi kiya gaya.');return false}
+  }
+  window.aiRunCommand=function(){const input=document.getElementById('aiCommand');const q=input?.value||'';if(!q.trim())return toast('Type a command');if(runAICommand(q,false)){input.value='';toast('AI command executed')}else toast('Command not recognized — try the suggestions')};
+  window.szAiChatQuick=function(q){const i=document.getElementById('sz-ai-chat-input');if(i)i.value=q;window.szAiChatSend()};
+  window.szAiChatSend=function(){const input=document.getElementById('sz-ai-chat-input');const q=(input?.value||'').trim();if(!q)return;input.value='';runAICommand(q,true)};
+  // Enter key should execute the same active command engine.
+  document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeElement?.id==='aiCommand'){e.preventDefault();window.aiRunCommand()}else if(e.key==='Enter'&&document.activeElement?.id==='sz-ai-chat-input'){e.preventDefault();window.szAiChatSend()}});
+  // AI self-recommendation refresh when Copilot is opened, plus a light periodic refresh while visible.
+  const oldOpenPage=window.openPage;
+  if(typeof oldOpenPage==='function'&&!oldOpenPage.__v49ai){
+    window.openPage=function(id){const r=oldOpenPage.apply(this,arguments);if(id==='ai')setTimeout(aiAnalyzeSafe,60);return r};window.openPage.__v49ai=true;
+  }
+  let lastAi=0;setInterval(()=>{const page=document.getElementById('ai');if(page?.classList.contains('active')&&Date.now()-lastAi>30000){lastAi=Date.now();aiAnalyzeSafe()}},5000);
+})();
+</script>
+
+</body>
+</html>
